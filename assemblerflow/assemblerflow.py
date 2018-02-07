@@ -119,7 +119,7 @@ class NextflowGenerator:
         dict: Stores the secondary input channels that may be required by
         some processes. The key is the params variable and the key is the
         channel definition for nextflow::
-        
+
             {"genomeSize": "IN_genome_size = Channel.value(params.genomeSize)"}
             
         """
