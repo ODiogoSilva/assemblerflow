@@ -121,7 +121,7 @@ class NextflowGenerator:
         channel definition for nextflow::
 
             {"genomeSize": "IN_genome_size = Channel.value(params.genomeSize)"}
-            
+
         """
 
         self.status_channels = []
