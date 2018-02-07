@@ -169,7 +169,7 @@ class NextflowGenerator:
         """
 
         logger.debug("Building header")
-        self.template += hs.header + hs.start_channel
+        self.template += hs.header
 
     def _set_channels(self):
         """Sets the main channels for the pipeline
