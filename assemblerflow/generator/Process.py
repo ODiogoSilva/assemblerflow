@@ -547,7 +547,7 @@ class PathoTyping(Process):
         self.secondary_inputs = [
             {
                 "params": "pathoSpecies",
-                "channel": "IN_genome_size = "
+                "channel": "IN_pathoSpecies = "
                            "Channel.value(params.pathoSpecies)"
             }
         ]
@@ -627,7 +627,7 @@ class FastQC(Process):
         self.secondary_inputs = [
             {
                 "params": "adapters",
-                "channel": "IN_genome_size = Channel.value(params.adapters)"
+                "channel": "IN_adapters = Channel.value(params.adapters)"
             }
         ]
 
@@ -659,12 +659,13 @@ class Trimmomatic(Process):
         self.secondary_inputs = [
             {
                 "params": "trimOpts",
-                "channel": "IN_genome_size = "
+                "channel": "IN_trimmomatic_opts = "
                            "Channel.value([params.trimSlidingWindow,"
                            "params.trimLeading,params.trimTrailing,"
                            "params.trimMinLength])"
             }
         ]
+
 
 class FastqcTrimmomatic(Process):
     """Fastqc + Trimmomatic process template interface
@@ -705,11 +706,11 @@ class FastqcTrimmomatic(Process):
         self.secondary_inputs = [
             {
                 "params": "adapters",
-                "channel": "IN_genome_size = Channel.value(params.adapters)"
+                "channel": "IN_adapters = Channel.value(params.adapters)"
             },
             {
                 "params": "trimOpts",
-                "channel": "IN_genome_size = "
+                "channel": "IN_trimmomatic_opts = "
                            "Channel.value([params.trimSlidingWindow,"
                            "params.trimLeading,params.trimTrailing,"
                            "params.trimMinLength])"
