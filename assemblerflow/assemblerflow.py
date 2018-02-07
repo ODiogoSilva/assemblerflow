@@ -114,6 +114,16 @@ class NextflowGenerator:
         dict: Stores secondary channel links
         """
 
+        self.secondary_inputs = {}
+        """
+        dict: Stores the secondary input channels that may be required by
+        some processes. The key is the params variable and the key is the
+        channel definition for nextflow::
+        
+            {"genomeSize": "IN_genome_size = Channel.value(params.genomeSize)"}
+            
+        """
+
         self.status_channels = []
         """
         list: Stores the status channels from each process
@@ -261,11 +271,26 @@ class NextflowGenerator:
                     p.template, p.status_channels))
                 self.status_channels.append(p.status_strs)
 
+            if p.secondary_inputs:
+                logger.debug("[{}] Found secondary input channel(s): "
+                             "{}".format(p.template, p.secondary_inputs))
+                for ch in p.secondary_inputs:
+                    if ch["params"] not in self.secondary_inputs:
+                        logger.debug("[{}] Added channel: {}".format(
+                            p.template, ch["channel"]))
+                        self.secondary_inputs[ch["params"]] = ch["channel"]
+
             logger.debug("[{}] Setting main channels with pid '{}' and "
                          "process_id '{}'".format(
                              p.template, pidx, p.process_id))
 
             p.set_channels(**{"pid": pidx, "process_id": p.process_id})
+
+    def _set_secondary_inputs(self):
+
+        # Get init process
+        init_process = self.processes[0]
+        init_process.set_secondary_inputs(self.secondary_inputs)
 
     def _set_secondary_channels(self):
         """Sets the secondary channels for the pipeline
@@ -341,6 +366,8 @@ class NextflowGenerator:
         self._build_header()
 
         self._set_channels()
+
+        self._set_secondary_inputs()
 
         self._set_secondary_channels()
 
