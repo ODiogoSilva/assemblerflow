@@ -68,7 +68,7 @@ class NextflowGenerator:
     dict: Maps the process ids to the corresponding template interface class
     """
 
-    def __init__(self, process_list, nextflow_file, process_ids=None):
+    def __init__(self, process_list, nextflow_file):
 
         # Check if all specified processes are available
         for p in process_list:
@@ -76,23 +76,10 @@ class NextflowGenerator:
                 raise ValueError(
                     "The process '{}' is not available".format(p))
 
-        # Check for consistency between the provided process ids and the
-        # number of processes
-        if process_ids:
-            if len(process_ids) != len(process_list):
-                raise ProcessError(
-                    "The provided list of process ids must match the length"
-                    " of the process list."
-                )
-
-        else:
-            process_ids = [None] * len(process_list)
-
         init_process = [pc.Init(template="init")]
 
         processes = [
-            self.process_map[p](template=p, process_id=pid) for p, pid in
-            zip(process_list, process_ids)
+            self.process_map[p](template=p) for p in process_list
         ]
         self.processes = init_process + processes
         """
@@ -280,11 +267,10 @@ class NextflowGenerator:
                             p.template, ch["channel"]))
                         self.secondary_inputs[ch["params"]] = ch["channel"]
 
-            logger.debug("[{}] Setting main channels with pid '{}' and "
-                         "process_id '{}'".format(
-                             p.template, pidx, p.process_id))
+            logger.debug("[{}] Setting main channels with pid '{}'".format(
+                p.template, pidx))
 
-            p.set_channels(**{"pid": pidx, "process_id": p.process_id})
+            p.set_channels(**{"pid": pidx})
 
     def _set_secondary_inputs(self):
 
@@ -386,7 +372,6 @@ def get_args():
         description="Nextflow pipeline generator")
 
     parser.add_argument("-t", "--tasks", nargs="+", dest="tasks",
-                        type=get_tuples,
                         help="Space separated tasks of the pipeline")
     parser.add_argument("-o", dest="output_nf",
                         help="Name of the pipeline file")
@@ -401,19 +386,6 @@ def get_args():
     args = parser.parse_args()
 
     return args
-
-
-def get_tuples(task):
-
-    task_id = task.split(":")
-
-    if len(task_id) != 2:
-        raise argparse.ArgumentTypeError(
-            "Tasks arguments must be in a format of <task>:<task id> "
-            "(e.g.: 'spades:5')")
-
-    # print(tasks_ids)
-    return task_id
 
 
 def copy_project(path):
@@ -465,15 +437,8 @@ def run(args):
         ch.setFormatter(formatter)
         logger.addHandler(ch)
 
-    # Get process names
-    process_names = [x[0] for x in args.tasks]
-
-    # Get process ids
-    process_ids = [x[1] for x in args.tasks]
-
     # nfg = NextflowGenerator(args.tasks, args.output_nf)
-    nfg = NextflowGenerator(process_list=process_names,
-                            process_ids=process_ids,
+    nfg = NextflowGenerator(process_list=args.tasks,
                             nextflow_file=args.output_nf)
     # nfg = NextflowGenerator(pipeline, "/home/diogosilva/teste/teste.nf")
 

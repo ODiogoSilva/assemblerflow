@@ -36,7 +36,7 @@ class Process:
         Templates are stored in ``generator/templates``.
     """
 
-    def __init__(self, ptype, template, process_id=None):
+    def __init__(self, ptype, template):
 
         accepted_types = [
             "init",
@@ -60,14 +60,6 @@ class Process:
         """
         int: Process ID number that represents the order and position in the
         generated pipeline
-        """
-
-        self.process_id = process_id
-        """
-        int or str: optional Process ID that has no effect on the setup of
-        the pipeline channels. It's used for the POST requests of each main
-        process and is mapped to the process IDs of the innuendo/oneida
-        platform
         """
 
         self.ptype = ptype
