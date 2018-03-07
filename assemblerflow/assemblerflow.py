@@ -66,23 +66,22 @@ def get_args():
 
 def check_arguments(args):
 
-    passed = True
-
     # Check if no args are passed
     if len(sys.argv) == 1:
         logger.info(colored_print("Please provide one of the supported "
                                   "arguments!", "red_bold"))
-        passed = False
+        return False
 
     # Check if output argument is valid
-    if not args.output_nf or os.path.isdir(args.output_nf) or not \
-            os.path.isdir(os.path.dirname(args.output_nf)):
+    if not args.output_nf or os.path.isdir(args.output_nf) or \
+            (not os.path.isdir(os.path.dirname(args.output_nf)) and
+             len(args.output_nf.split(os.path.sep)) > 1):
         logger.info(colored_print("Please provide a valid output file and "
                                   "location!",
                                   "red_bold"))
-        passed = False
+        return False
 
-    return passed
+    return True
 
 
 def copy_project(path):
