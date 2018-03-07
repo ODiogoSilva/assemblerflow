@@ -64,6 +64,27 @@ def get_args():
     return args
 
 
+def check_arguments(args):
+
+    passed = True
+
+    # Check if no args are passed
+    if len(sys.argv) == 1:
+        logger.info(colored_print("Please provide one of the supported "
+                                  "arguments!", "red_bold"))
+        passed = False
+
+    # Check if output argument is valid
+    if not args.output_nf or os.path.isdir(args.output_nf) or not \
+            os.path.isdir(os.path.dirname(args.output_nf)):
+        logger.info(colored_print("Please provide a valid output file and "
+                                  "location!",
+                                  "red_bold"))
+        passed = False
+
+    return passed
+
+
 def copy_project(path):
     """
 
@@ -150,6 +171,12 @@ def run(args):
         proc_collector(process_map, arguments_list)
         sys.exit(0)
 
+    # Validate arguments
+    passed = check_arguments(args)
+
+    if not passed:
+        return
+
     try:
         logger.info(colored_print("Checking pipeline for errors..."))
         pipeline_list = parse_pipeline(args.tasks)
@@ -173,6 +200,8 @@ def run(args):
     # copy template to cwd, to allow for immediate execution
     if args.include_templates:
         copy_project(args.output_nf)
+
+    logger.info(colored_print("\nDONE!", "green_bold"))
 
 
 def main():
