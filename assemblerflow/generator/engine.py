@@ -3,7 +3,7 @@ import logging
 
 from collections import defaultdict
 
-logger = logging.getLogger("engine")
+logger = logging.getLogger("main.{}".format(__name__))
 
 try:
     import generator.process as pc
@@ -335,10 +335,30 @@ class NextflowGenerator:
                 p.template, p.link_end))
             for l in p.link_end:
 
+                parent_forks = self._get_fork_tree(p)
+
+                # Parse special case where the secondary channel links with
+                # the main output of the specified type
+                if l["link"].startswith("__"):
+                    output_type = l["link"].lstrip("_")
+                    for proc in self.processes[::-1]:
+                        if proc.lane not in parent_forks:
+                            continue
+                        if proc.output_type == output_type:
+                            proc.update_main_forks("{}_{}".format(
+                                l["alias"], p.pid))
+                            logger.debug(
+                                "[{}] Found special implicit link '{}' with "
+                                "output type '{}'. Linked '{}' with process "
+                                "{}".format(
+                                    p.template, l["link"], output_type,
+                                    l["alias"], proc))
+                            break
+                    continue
+
                 if l["link"] not in self.secondary_channels:
                     continue
 
-                parent_forks = self._get_fork_tree(p)
                 for lane in parent_forks:
                     if lane in self.secondary_channels[l["link"]]:
                         self.secondary_channels[
@@ -394,86 +414,6 @@ class NextflowGenerator:
             self._update_secondary_inputs(p)
 
             self._update_secondary_channels(p)
-
-        # for idx, p in enumerate(self.processes):
-        #
-        #     # Make sure that the process id starts at 1
-        #     if not p.ignore_pid:
-        #         pidx += 1
-        #     else:
-        #         logger.debug("[{}] Ignoring process id increment".format(
-        #             p.template
-        #         ))
-        #
-        #     if p.ptype == "terminal":
-        #         # Get last main channel
-        #         channel_str = previous_channel._main_out_str
-        #         p._main_in_str = channel_str
-        #         p.link_end = [{"link": channel_str,
-        #                        "alias": channel_str}]
-        #
-        #     logger.debug("[{}] Setting main channels for idx '{}'".format(
-        #         p.template, pidx))
-        #     logger.debug("[{}] Expected input type: {}".format(
-        #         p.template, p.input_type))
-        #
-        #     if not previous_channel:
-        #         # Set the first output type
-        #         previous_channel = p
-        #     else:
-        #         logger.debug(
-        #             "[{}] Previous output type for template: {}".format(
-        #                 p.template, previous_channel.output_type))
-        #         # Check if the connecting processes can be linked by their
-        #         # input/output types
-        #         if p.ignore_type:
-        #             pass
-        #         elif previous_channel.output_type != p.input_type:
-        #             raise ChannelError(previous_channel.template,
-        #                                previous_channel.output_type,
-        #                                p.template,
-        #                                p.input_type)
-        #         else:
-        #             previous_channel = p
-        #
-        #     logger.debug("[{}] Checking secondary links".format(p.template))
-        #
-        #     # Check if the current process has a start of a secondary
-        #     # side channel
-        #     if p.link_start:
-        #         logger.debug("[{}] Found secondary link start: {}".format(
-        #             p.template, p.link_start))
-        #         for l in p.link_start:
-        #             self.secondary_channels[l] = {"p": p, "end": []}
-        #
-        #     # check if the current process receives a secondary side channel.
-        #     # If so, add to the links list of that side channel
-        #     if p.link_end:
-        #         logger.debug("[{}] Found secondary link end: {}".format(
-        #             p.template, p.link_end))
-        #         for l in p.link_end:
-        #             if l["link"] in self.secondary_channels:
-        #                 self.secondary_channels[l["link"]]["end"].append(
-        #                     "{}_{}".format(l["alias"], pidx))
-        #
-        #     if p.status_channels:
-        #         logger.debug("[{}] Added status channel(s): {}".format(
-        #             p.template, p.status_channels))
-        #         self.status_channels.append(p.status_strs)
-        #
-        #     if p.secondary_inputs:
-        #         logger.debug("[{}] Found secondary input channel(s): "
-        #                      "{}".format(p.template, p.secondary_inputs))
-        #         for ch in p.secondary_inputs:
-        #             if ch["params"] not in self.secondary_inputs:
-        #                 logger.debug("[{}] Added channel: {}".format(
-        #                     p.template, ch["channel"]))
-        #                 self.secondary_inputs[ch["params"]] = ch["channel"]
-        #
-        #     logger.debug("[{}] Setting main channels with pid '{}'".format(
-        #         p.template, pidx))
-        #
-        #     p.set_channels(**{"pid": pidx})
 
     def _set_secondary_inputs(self):
 

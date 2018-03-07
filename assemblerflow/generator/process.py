@@ -336,7 +336,20 @@ class Process:
 
         """
 
+        if not self.main_forks:
+            self.main_forks = [self.output_channel]
+            self.output_channel = "_{}".format(self.output_channel)
         self.main_forks.append(sink)
+
+        fork_lst = self.forks + self.main_forks
+        operator = "set" if len(fork_lst) == 1 else "into"
+        self.forks.append("\n{}.{}{{ {} }}\n".format(
+            self.output_channel, operator, ";".join(fork_lst))
+        )
+
+        self._context = {**self._context,
+                         **{"forks": "\n".join(self.forks),
+                            "output_channel": self.output_channel}}
 
     def set_secondary_channel(self, source, channel_list):
         """ General purpose method for setting a secondary channel
@@ -861,7 +874,7 @@ class AssemblyMapping(Process):
         self.status_channels = ["STATUS_am", "STATUS_amp"]
 
         self.link_start.append("SIDE_BpCoverage")
-        self.link_end.append({"link": "MAIN_fq", "alias": "_MAIN_assembly"})
+        self.link_end.append({"link": "__fastq", "alias": "_LAST_fastq"})
 
         self.secondary_inputs = [
             {
