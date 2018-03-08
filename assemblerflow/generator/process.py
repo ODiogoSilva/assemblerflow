@@ -42,10 +42,13 @@ class Process:
             "channel": "IN_fastq_raw",
             "channel_str": "IN_fastq_raw = Channel.fromFilePairs(params.fastq)"
         },
-        "assembly": {
+        "fasta": {
             "params": "fasta",
             "channel": "IN_fasta_raw",
-            "channel_str": "IN_fasta_raw = Channel.fromFilePairs(params.fasta)"
+            "channel_str": "IN_fasta_raw = Channel.fromPath(params.fasta)"
+                           ".map{ it -> [it.toString().tokenize('/').last()"
+                           ".tokenize('.').first().tokenize('_').first(),"
+                           " it] }"
         }
     }
     """
@@ -228,7 +231,7 @@ class Process:
         self.output_channel = "{}_out_{}".format(self.template, output_suffix)
         self.lane = lane
 
-    def get_user_channel(self):
+    def get_user_channel(self, input_channel, input_type=None):
         """Sets the main raw channels for the process
 
         This will set the :attr:`~Process._input_user_channel` attribute
@@ -238,10 +241,15 @@ class Process:
         attribute to None
         """
 
-        res = {"input_channel": self.input_channel}
+        res = {"input_channel": input_channel}
+
+        if input_type:
+            channel_info = self.RAW_MAPPING[input_type]
+        else:
+            channel_info = self.RAW_MAPPING[self.input_type]
 
         if self.input_type in self.RAW_MAPPING:
-            return {**res, **self.RAW_MAPPING[self.input_type]}
+            return {**res, **channel_info}
 
     @staticmethod
     def render(template, context):
@@ -774,7 +782,7 @@ class Skesa(Process):
         super().__init__(**kwargs)
 
         self.input_type = "fastq"
-        self.output_type = "assembly"
+        self.output_type = "fasta"
 
 
 class Spades(Process):
@@ -796,7 +804,7 @@ class Spades(Process):
         super().__init__(**kwargs)
 
         self.input_type = "fastq"
-        self.output_type = "assembly"
+        self.output_type = "fasta"
 
         self.link_end.append({"link": "SIDE_max_len", "alias": "SIDE_max_len"})
 
@@ -830,8 +838,8 @@ class ProcessSpades(Process):
 
         super().__init__(**kwargs)
 
-        self.input_type = "assembly"
-        self.output_type = "assembly"
+        self.input_type = "fasta"
+        self.output_type = "fasta"
 
         self.secondary_inputs = [
             {
@@ -868,8 +876,8 @@ class AssemblyMapping(Process):
 
         super().__init__(**kwargs)
 
-        self.input_type = "assembly"
-        self.output_type = "assembly"
+        self.input_type = "fasta"
+        self.output_type = "fasta"
 
         self.status_channels = ["STATUS_am", "STATUS_amp"]
 
@@ -882,6 +890,10 @@ class AssemblyMapping(Process):
                 "channel": "IN_assembly_mapping_opts = "
                            "Channel.value([params.minAssemblyCoverage,"
                            "params.AMaxContigs])"
+            },
+            {
+                "params": "genomeSize",
+                "channel": "IN_genome_size = Channel.value(params.genomeSize)"
             }
         ]
 
@@ -905,8 +917,8 @@ class Pilon(Process):
 
         super().__init__(**kwargs)
 
-        self.input_type = "assembly"
-        self.output_type = "assembly"
+        self.input_type = "fasta"
+        self.output_type = "fasta"
 
         self.dependencies = ["assembly_mapping"]
 
@@ -933,8 +945,8 @@ class Mlst(Process):
 
         super().__init__(**kwargs)
 
-        self.input_type = "assembly"
-        self.output_type = "assembly"
+        self.input_type = "fasta"
+        self.output_type = "fasta"
 
 
 class Abricate(Process):
@@ -956,7 +968,7 @@ class Abricate(Process):
 
         super().__init__(**kwargs)
 
-        self.input_type = "assembly"
+        self.input_type = "fasta"
         self.output_type = None
 
         self.ignore_type = True
@@ -985,7 +997,7 @@ class Prokka(Process):
 
         super().__init__(**kwargs)
 
-        self.input_type = "assembly"
+        self.input_type = "fasta"
         self.output_type = None
 
         self.ignore_type = True
@@ -1014,7 +1026,7 @@ class Chewbbaca(Process):
 
         super().__init__(**kwargs)
 
-        self.input_type = "assembly"
+        self.input_type = "fasta"
         self.output_type = None
 
         self.ignore_type = True

@@ -122,6 +122,7 @@ class NextflowGenerator:
             logger.debug("[{}] Input lane: {}".format(p, in_lane))
             logger.debug("[{}] Output lane: {}".format(p, out_lane))
 
+            # Get process names
             p_in_name = con["input"]["process"]
             logger.debug("[{}] Input channel: {}".format(p, p_in_name))
             p_out_name = con["output"]["process"]
@@ -245,7 +246,7 @@ class NextflowGenerator:
         logger.debug("===============")
         self.template += hs.header
 
-    def _update_raw_input(self, p):
+    def _update_raw_input(self, p, input_channel=None, input_type=None):
         """Given a process, this method updates the
         :attr:`~Process.main_raw_inputs` attribute with the corresponding
         raw input channel of that process
@@ -253,20 +254,29 @@ class NextflowGenerator:
         Parameters
         ----------
         p : assemblerflow.Process.Process
+        input_type : str or None
         """
 
-        logger.debug("[{}] Setting raw input channel".format(p.template))
-        raw_in = p.get_user_channel()
+        process_input = input_type if input_type else p.input_type
+        process_channel = input_channel if input_channel else p.input_channel
 
-        if p.input_type in self.main_raw_inputs:
-            self.main_raw_inputs[p.input_type]["raw_forks"].append(
+        logger.debug("[{}] Setting raw input channel "
+                     "with input type '{}'".format(p.template, process_input))
+        raw_in = p.get_user_channel(process_channel, process_input)
+        logger.debug("[{}] Fetched process raw user: {}".format(p.template,
+                                                                raw_in))
+
+        if process_input in self.main_raw_inputs:
+            self.main_raw_inputs[process_input]["raw_forks"].append(
                 raw_in["input_channel"])
         else:
-            self.main_raw_inputs[p.input_type] = {
+            self.main_raw_inputs[process_input] = {
                 "channel": raw_in["channel"],
                 "channel_str": raw_in["channel_str"],
                 "raw_forks": [raw_in["input_channel"]]
             }
+        logger.debug("[{}] Updated main raw inputs: {}".format(
+            p.template, self.main_raw_inputs))
 
     def _update_secondary_inputs(self, p):
         """Given a process, this method updates the
@@ -313,6 +323,37 @@ class NextflowGenerator:
 
         return parent_lanes
 
+    def _set_implicit_link(self, p, link):
+        """
+
+        Parameters
+        ----------
+        p
+        link
+
+        Returns
+        -------
+
+        """
+
+        output_type = link["link"].lstrip("_")
+        parent_forks = self._get_fork_tree(p)
+        fork_sink = "{}_{}".format(link["alias"], p.pid)
+
+        for proc in self.processes[::-1]:
+            if proc.lane not in parent_forks:
+                continue
+            if proc.output_type == output_type:
+                proc.update_main_forks(fork_sink)
+                logger.debug("[{}] Found special implicit link '{}' with "
+                             "output type '{}'. Linked '{}' with process "
+                             "{}".format(
+                                     p.template, link["link"], output_type,
+                                     link["alias"], proc))
+                return
+
+        self._update_raw_input(p,fork_sink, output_type)
+
     def _update_secondary_channels(self, p):
         """
 
@@ -342,20 +383,7 @@ class NextflowGenerator:
                 # Parse special case where the secondary channel links with
                 # the main output of the specified type
                 if l["link"].startswith("__"):
-                    output_type = l["link"].lstrip("_")
-                    for proc in self.processes[::-1]:
-                        if proc.lane not in parent_forks:
-                            continue
-                        if proc.output_type == output_type:
-                            proc.update_main_forks("{}_{}".format(
-                                l["alias"], p.pid))
-                            logger.debug(
-                                "[{}] Found special implicit link '{}' with "
-                                "output type '{}'. Linked '{}' with process "
-                                "{}".format(
-                                    p.template, l["link"], output_type,
-                                    l["alias"], proc))
-                            break
+                    self._set_implicit_link(p, l)
                     continue
 
                 if l["link"] not in self.secondary_channels:
