@@ -240,7 +240,9 @@ class NextflowGenerator:
         """Adds the header template to the master template string
         """
 
+        logger.debug("===============")
         logger.debug("Building header")
+        logger.debug("===============")
         self.template += hs.header
 
     def _update_raw_input(self, p):
@@ -398,7 +400,9 @@ class NextflowGenerator:
         process.
         """
 
+        logger.debug("=====================")
         logger.debug("Setting main channels")
+        logger.debug("=====================")
 
         for i, p in enumerate(self.processes):
 
@@ -417,9 +421,17 @@ class NextflowGenerator:
 
     def _set_secondary_inputs(self):
 
+        logger.debug("========================")
+        logger.debug("Setting secondary inputs")
+        logger.debug("========================")
+
         # Get init process
         init_process = self.processes[0]
+        logger.debug("Setting main raw inputs: "
+                     "{}".format(self.main_raw_inputs))
         init_process.set_raw_inputs(self.main_raw_inputs)
+        logger.debug("Setting secondary inputs: "
+                     "{}".format(self.secondary_inputs))
         init_process.set_secondary_inputs(self.secondary_inputs)
 
     def _set_secondary_channels(self):
@@ -430,6 +442,10 @@ class NextflowGenerator:
         populated when executing :py:func:`NextflowGenerator._set_channels`
         method.
         """
+
+        logger.debug("==========================")
+        logger.debug("Setting secondary channels")
+        logger.debug("==========================")
 
         logger.debug("Setting secondary channels: {}".format(
             self.secondary_channels))
