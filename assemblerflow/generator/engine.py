@@ -3,6 +3,11 @@ import logging
 
 from collections import defaultdict
 
+try:
+    from generator.process_details import colored_print
+except ImportError:
+    from assemblerflow.generator.process_details import colored_print
+
 logger = logging.getLogger("main.{}".format(__name__))
 
 try:
@@ -42,25 +47,41 @@ dict: Maps the process ids to the corresponding template interface class
 
 class NextflowGenerator:
 
-    def __init__(self, process_list, nextflow_file):
+    def __init__(self, process_connections, nextflow_file):
 
         # Check if all specified processes are available
-        for p in process_list:
-            pname = p["input"]["process"]
+        for p in process_connections:
+            pname = p["output"]["process"]
             if pname not in process_map and pname != "__init__":
-                logger.error("The process '{}' is not available".format(pname))
+                logger.error(colored_print(
+                    "\nThe process '{}' is not available".format(pname),
+                    "red_bold"))
                 sys.exit(1)
 
         self.processes = []
 
+        # Create the processes attribute with the first special init process.
+        # This process will handle the forks of the raw input channels and
+        # secondary inputs
         self.processes = [pc.Init(template="init")]
         """
         list: Stores the process interfaces in the specified order
         """
 
         self._fork_tree = defaultdict(list)
+        """
+        dict: A dictionary with the fork tree of the pipeline, which consists
+        on the the paths of each lane. For instance, a single fork with two
+        sinks is represented as: {1: [2,3]}. Subsequent forks are then added
+        sequentially: {1:[2,3], 2:[3,4,5]}. This allows the path upstream
+        of a process in a given lane to be traversed until the start of the
+        pipeline. 
+        """
 
-        self._build_connections(process_list)
+        # Builds the connections in the processes, which parses the
+        # process_connections dictionary into the self.processes attribute
+        # list.
+        self._build_connections(process_connections)
 
         self.nf_file = nextflow_file
         """
@@ -101,7 +122,14 @@ class NextflowGenerator:
         # self._check_pipeline_requirements()
 
     def _build_connections(self, process_list):
-        """
+        """Parses the process connections dictionaries into a process list
+
+        This method is called upon instantiation of the NextflowGenerator
+        class. Essentially, it sets the main input/output channel names of the
+        processes so that they can be linked correctly.
+
+        If a connection between two consecutive process is not possible due
+        to a mismatch in the input/output types, it exits with an error.
 
         Returns
         -------
@@ -130,6 +158,7 @@ class NextflowGenerator:
 
             # Instance output process
             out_process = process_map[p_out_name](template=p_out_name)
+            # Set suffix strings for main input/output channels
             input_suf = "{}_{}".format(in_lane, p)
             output_suf = "{}_{}".format(out_lane, p)
             logger.debug("[{}] Setting main channels with input suffix '{}'"
@@ -140,6 +169,7 @@ class NextflowGenerator:
             # Instance input process, if it exists. In case of init, the
             # output process forks from the raw input user data
             if p_in_name != "__init__":
+                # Create instance of input process
                 in_process = process_map[p_in_name](template=p_in_name)
                 # Test if two processes can be connected by input/output types
                 logger.debug("[{}] Testing connection between input and "
@@ -147,6 +177,10 @@ class NextflowGenerator:
                 self._test_connection(in_process, out_process)
                 out_process.parent_lane = in_lane
             else:
+                # When the input process is __init__, set the parent_lane
+                # to None. This will tell the engine that the main input
+                # channel the output process of this connection will received
+                # from the raw user input.
                 out_process.parent_lane = None
 
             # If the current connection is a fork, add it to the fork tree
@@ -246,22 +280,32 @@ class NextflowGenerator:
         logger.debug("===============")
         self.template += hs.header
 
-    def _update_raw_input(self, p, input_channel=None, input_type=None):
+    def _update_raw_input(self, p, sink_channel=None, input_type=None):
         """Given a process, this method updates the
         :attr:`~Process.main_raw_inputs` attribute with the corresponding
-        raw input channel of that process
+        raw input channel of that process. The input channel and input type
+        can be overridden if the `input_channel` and `input_type` arguments
+        are provided.
 
         Parameters
         ----------
         p : assemblerflow.Process.Process
-        input_type : str or None
+            Process instance whose raw input will be modified
+        sink_channel: str
+            Sets the channel where the raw input will fork into. It overrides
+            the process's `input_channel` attribute.
+        input_type: str
+            Sets the type of the raw input. It overrides the process's
+            `input_type` attribute.
         """
 
         process_input = input_type if input_type else p.input_type
-        process_channel = input_channel if input_channel else p.input_channel
+        process_channel = sink_channel if sink_channel else p.input_channel
 
         logger.debug("[{}] Setting raw input channel "
                      "with input type '{}'".format(p.template, process_input))
+        # Get the dictionary with the raw forking information for the
+        # provided input
         raw_in = p.get_user_channel(process_channel, process_input)
         logger.debug("[{}] Fetched process raw user: {}".format(p.template,
                                                                 raw_in))
@@ -352,15 +396,31 @@ class NextflowGenerator:
                                      link["alias"], proc))
                 return
 
-        self._update_raw_input(p,fork_sink, output_type)
+        self._update_raw_input(p, fork_sink, output_type)
 
     def _update_secondary_channels(self, p):
-        """
+        """Given a process, this method updates the
+        :attr:`~Process.secondary_channels` attribute with the corresponding
+        secondary inputs of that channel.
+
+        The rationale of the secondary channels is the following:
+
+            - Start storing any secondary emitting channels, by checking the
+              `link_start` list attribute of each process. If there are
+              channel names in the link start, it adds to the secondary
+              channels dictionary.
+            - Check for secondary receiving channels, by checking the
+              `link_end` list attribute. If the link name starts with a
+              `__` signature, it will created an implicit link with the last
+              process with an output type after the signature. Otherwise,
+              it will check is a corresponding link start already exists in
+              the at least one process upstream of the pipeline and if so,
+              it will update the ``secondary_channels`` attribute with the
+              new link.
 
         Parameters
         ----------
         p : assemblerflow.Process.Process
-
         """
 
         # Check if the current process has a start of a secondary
@@ -369,6 +429,8 @@ class NextflowGenerator:
             logger.debug("[{}] Found secondary link start: {}".format(
                 p.template, p.link_start))
             for l in p.link_start:
+                # If there are multiple link starts in the same lane, the
+                # last one is the only one saved.
                 self.secondary_channels[l] = {p.lane: {"p": p, "end": []}}
 
         # check if the current process receives a secondary side channel.
@@ -378,6 +440,7 @@ class NextflowGenerator:
                 p.template, p.link_end))
             for l in p.link_end:
 
+                # Get list of lanes from the parent forks.
                 parent_forks = self._get_fork_tree(p)
 
                 # Parse special case where the secondary channel links with
@@ -386,6 +449,8 @@ class NextflowGenerator:
                     self._set_implicit_link(p, l)
                     continue
 
+                # Skip if there is no match for the current link in the
+                # secondary channels
                 if l["link"] not in self.secondary_channels:
                     continue
 
@@ -401,22 +466,22 @@ class NextflowGenerator:
     def _set_channels(self):
         """Sets the main channels for the pipeline
 
-        The setup of the main channels follows four main steps for each
-        process specified in the :py:attr:`NextflowGenerator.processes`
-        attribute:
+        This method will parse de the :attr:`~Process.processes` attribute
+        and perform the following tasks for each process:
 
-            - (If not the first process) Checks if the input of the current
-            process is compatible with the output of the previous process.
-            - Checks if the current process has starts any secondary channels.
-            If so, populate the :py:attr:`NextflowGenerator.secondary_channels`
-            with the name of the link start, the process class and a list
-            to harbour potential receiving ends.
-            - Checks if the current process receives from any secondary
-            channels. If a corresponding secondary link has been previously
-            set, it will populate the
-            :py:attr:`NextflowGenerator.secondary_channels` attribute with
-            the receiving channels.
-            - Sets the main channels by providing the process ID.
+            - Sets the input/output channels and main input forks and adds
+              them to the process's
+              :attr:`assemblerflow.process.Process._context`
+              attribute (See
+              :func:`~NextflowGenerator.set_channels`).
+            - Automatically updates the main input channel of the first
+              process of each lane so that they fork from the user provide
+              parameters (See
+              :func:`~NextflowGenerator._update_raw_input`).
+            - Check for the presence of secondary inputs and adds them to the
+              :attr:`~NextflowGenerator.secondary_inputs` attribute.
+            - Check for the presence of secondary channels and adds them to the
+              :attr:`~NextflowGenerator.secondary_channels` attribute.
 
         Notes
         -----
@@ -425,7 +490,8 @@ class NextflowGenerator:
         instance, If there are two processes that start a secondary channel
         for the ``SIDE_max_len`` channel, only the last one will be recorded,
         and all receiving processes will get the channel from the latest
-        process.
+        process. Secondary channels can only link if the source process if
+        downstream of the sink process in its "forking" path.
         """
 
         logger.debug("=====================")
@@ -448,6 +514,15 @@ class NextflowGenerator:
             self._update_secondary_channels(p)
 
     def _set_secondary_inputs(self):
+        """Sets the main raw inputs and secondary inputs on the init process
+
+        This method will fetch the :class:`assemblerflow.process.Init` process
+        instance and sets the raw input (
+        :func:`assemblerflow.process.Init.set_raw_inputs`) and the secondary
+        inputs (:func:`assemblerflow.process.Init.set_secondary_inputs`) for
+        that process. This will handle the connection of the user parameters
+        with channels that are then consumed in the pipeline.
+        """
 
         logger.debug("========================")
         logger.debug("Setting secondary inputs")
@@ -467,8 +542,8 @@ class NextflowGenerator:
 
         This will iterate over the
         :py:attr:`NextflowGenerator.secondary_channels` dictionary that is
-        populated when executing :py:func:`NextflowGenerator._set_channels`
-        method.
+        populated when executing
+        :func:`~NextflowGenerator._update_secondary_channels` method.
         """
 
         logger.debug("==========================")
@@ -526,8 +601,9 @@ class NextflowGenerator:
         the nextflow code of the pipeline.
 
         First it builds the header, then sets the main channels, the
-        secondary channels and finally the status channels. When the pipeline
-        is built, is writes the code to a nextflow file.
+        secondary inputs, secondary channels and finally the
+        status channels. When the pipeline is built, is writes the code
+        to a nextflow file.
         """
 
         # Generate regular nextflow header that sets up the shebang, imports

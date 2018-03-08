@@ -188,7 +188,7 @@ def run(args):
     if args.check_only:
         sys.exit()
 
-    nfg = NextflowGenerator(process_list=pipeline_list,
+    nfg = NextflowGenerator(process_connections=pipeline_list,
                             nextflow_file=args.output_nf)
 
     logger.info(colored_print("\nBuilding your awesome pipeline..."))

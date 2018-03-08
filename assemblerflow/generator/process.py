@@ -47,8 +47,7 @@ class Process:
             "channel": "IN_fasta_raw",
             "channel_str": "IN_fasta_raw = Channel.fromPath(params.fasta)"
                            ".map{ it -> [it.toString().tokenize('/').last()"
-                           ".tokenize('.').first().tokenize('_').first(),"
-                           " it] }"
+                           ".tokenize('.').first(), it] }"
         }
     }
     """
@@ -214,8 +213,8 @@ class Process:
         self._template_path = join(tpl_dir, template + ".nf")
 
     def set_main_channel_names(self, input_suffix, output_suffix, lane):
-        """Sets the main channel names based on the input and output lanes
-        of the process. This is performed when connecting processes.
+        """Sets the main channel names based on the provide input and
+        output channel suffixes. This is performed when connecting processes.
 
         Parameters
         ----------
