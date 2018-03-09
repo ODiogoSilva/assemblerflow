@@ -5,7 +5,7 @@ Reports the status of a sample in any given process.
 process status {
 
     tag { fastq_id }
-    publishDir "pipeline_status/$fastq_id"
+    publishDir "pipeline_status/$task_name"
 
     input:
     set fastq_id, task_name, status, warning, fail, file(log) from {{ status_channels }}
