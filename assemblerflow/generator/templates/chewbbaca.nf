@@ -61,7 +61,7 @@ process compileProfiles {
     publishDir "results/chewbbaca/", mode: "copy", overwrite: true
 
     input:
-    file profile from chewbbacaProfile
+    file profile from chewbbacaProfile.collect()
 
     output:
     file "chewbbaca_profiles.tsv"
