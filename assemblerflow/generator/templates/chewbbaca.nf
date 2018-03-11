@@ -13,7 +13,6 @@ process chewbbaca {
     maxForks 1
     tag { fastq_id + " getStats" }
     scratch true
-    // publishDir "results/chewbbaca/${fastq_id}"
     if (params.chewbbacaQueue != null) {
         queue '${params.chewbbacaQueue}'
     }
@@ -24,7 +23,7 @@ process chewbbaca {
 
     output:
     file 'chew_results'
-    file 'results'
+    file '*_cgMLST.tsv' optional true into chewbbacaProfile
     {% with task_name="chewbbaca" %}
     {%- include "compiler_channels.txt" ignore missing -%}
     {% endwith %}
@@ -47,10 +46,29 @@ process chewbbaca {
         else
             chewBBACA.py RemoveGenes -i chew_results/*/results_alleles.tsv -g chew_results/*/RepeatedLoci.txt -o alleleCallMatrix_cg
             chewBBACA.py ExtractCgMLST -i alleleCallMatrix_cg.tsv -o results -p $params.chewbbacaProfilePercentage
+            mv results/cgMLST.tsv ${fastq_id}_cgMLST.tsv
         fi
     } || {
         echo fail > .status
     }
+    """
+
+}
+
+
+process compileProfiles {
+
+    publishDir "results/chewbbaca/"
+
+    input:
+    file profile from chewbbacaProfile
+
+    output:
+    file "chewbbaca_profiles.tsv"
+
+    """
+    head -n1 ${profile[0]} > chewbbaca_profiles.tsv
+    tail -n1 $profile >> chewbbaca_profiles.tsv
     """
 
 }
