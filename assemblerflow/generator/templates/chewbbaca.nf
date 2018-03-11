@@ -24,6 +24,7 @@ process chewbbaca {
 
     output:
     file 'chew_results'
+    file 'results'
     {% with task_name="chewbbaca" %}
     {%- include "compiler_channels.txt" ignore missing -%}
     {% endwith %}
