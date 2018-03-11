@@ -44,9 +44,7 @@ process chewbbaca {
         if [ ! $jsonOpt = ""]; then
             merge_json.py ${params.schemaCore} chew_results/*/results*
         else
-            chewBBACA.py RemoveGenes -i chew_results/*/results_alleles.tsv -g chew_results/*/RepeatedLoci.txt -o alleleCallMatrix_cg
-            chewBBACA.py ExtractCgMLST -i alleleCallMatrix_cg.tsv -o results -p $params.chewbbacaProfilePercentage
-            mv results/cgMLST.tsv ${fastq_id}_cgMLST.tsv
+            mv chew_results/*/results_alleles.tsv ${fastq_id}_cgMLST.tsv
         fi
     } || {
         echo fail > .status
@@ -56,19 +54,20 @@ process chewbbaca {
 }
 
 
-process compileProfiles {
+process chewbbacaExtractMLST {
 
     publishDir "results/chewbbaca/", mode: "copy", overwrite: true
 
     input:
-    file profile from chewbbacaProfile.collect()
+    file profiles from chewbbacaProfile.collect()
 
     output:
-    file "chewbbaca_profiles.tsv"
+    file "results/cgMLST.tsv"
 
     """
-    head -n1 ${profile[0]} > chewbbaca_profiles.tsv
-    awk 'FNR == 2' $profile >> chewbbaca_profiles.tsv
+    head -n1 ${profiles[0]} > chewbbaca_profiles.tsv
+    awk 'FNR == 2' $profiles >> chewbbaca_profiles.tsv
+    chewBBACA.py ExtractCgMLST -i chewbbaca_profiles.tsv -o results -p $params.chewbbacaProfilePercentage
     """
 
 }
