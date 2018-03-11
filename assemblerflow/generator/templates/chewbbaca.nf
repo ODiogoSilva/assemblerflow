@@ -58,7 +58,7 @@ process chewbbaca {
 
 process compileProfiles {
 
-    publishDir "results/chewbbaca/"
+    publishDir "results/chewbbaca/", mode: "copy", overwrite: true
 
     input:
     file profile from chewbbacaProfile
@@ -68,7 +68,7 @@ process compileProfiles {
 
     """
     head -n1 ${profile[0]} > chewbbaca_profiles.tsv
-    tail -n1 $profile >> chewbbaca_profiles.tsv
+    awk 'FNR == 2' $profile >> chewbbaca_profiles.tsv
     """
 
 }
