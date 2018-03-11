@@ -1,5 +1,5 @@
 
-if (params.chewbbacaPhyloviz == true){
+if (params.chewbbacaToPhyloviz == true){
     jsonOpt = ""
 } else {
     jsonOpt = "--json"
@@ -24,6 +24,9 @@ process chewbbaca {
 
     output:
     file 'chew_results'
+    if (params.chewbbacaToPhyloviz == true){
+    set fastq_id, file('chew_results/*/results_alleles.tsv') into chewbbacaAlleles
+    }
     {% with task_name="chewbbaca" %}
     {%- include "compiler_channels.txt" ignore missing -%}
     {% endwith %}
@@ -51,3 +54,19 @@ process chewbbaca {
 
 }
 
+
+if (params.chewbbacaToPhyloviz == true){
+    process chewbbacaExtract {
+
+        tag { fastq_id }
+
+        input:
+        set fastqc_id, file(raw_tsv) from chewbbacaAlleles
+
+
+        script:
+        """
+        chewBBACA.py ExtractCgMLST -i $raw_tsv -o results -p params.chewbbacaProfilePercentage
+        """
+    }
+}
