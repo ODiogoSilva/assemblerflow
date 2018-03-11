@@ -24,9 +24,7 @@ process chewbbaca {
 
     output:
     file 'chew_results'
-    if (params.chewbbacaToPhyloviz == true){
-    set fastq_id, file('chew_results/*/results_alleles.tsv') into chewbbacaAlleles
-    }
+    set fastq_id, file('chew_results/*/results_alleles.tsv'), file('chew_results/*/RepeatedLoci.txt') optional true into chewbbacaAlleles
     {% with task_name="chewbbaca" %}
     {%- include "compiler_channels.txt" ignore missing -%}
     {% endwith %}
@@ -61,12 +59,13 @@ if (params.chewbbacaToPhyloviz == true){
         tag { fastq_id }
 
         input:
-        set fastqc_id, file(raw_tsv) from chewbbacaAlleles
+        set fastq_id, file(raw_tsv), file(repeat_loci) from chewbbacaAlleles
 
 
         script:
         """
-        chewBBACA.py ExtractCgMLST -i $raw_tsv -o results -p params.chewbbacaProfilePercentage
+        chewBBACA.py RemoveGenes -i $raw_tsv -g $repeat_loci -o alleleCallMatrix_cg
+        chewBBACA.py ExtractCgMLST -i alleleCallMatrix_cg.tsv -o results -p params.chewbbacaProfilePercentage
         """
     }
 }
