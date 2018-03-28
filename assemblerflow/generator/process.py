@@ -202,6 +202,12 @@ class Process:
         """
         self.secondary_input_str = ""
 
+        self.params = []
+        """
+        list: List of strings with the parameters required for any given 
+        process.
+        """
+
         self._context = {}
         """
         dict: Dictionary with the keyword placeholders for the string template
@@ -627,6 +633,11 @@ class IntegrityCoverage(Process):
         self.input_type = "fastq"
         self.output_type = "fastq"
 
+        self.params = {
+            "genomeSize": 2.1,
+            "minCoverage": 15
+        }
+
         self.secondary_inputs = [
             {
                 "params": "genomeSize",
@@ -665,6 +676,11 @@ class SeqTyping(Process):
             "version": "0.1.0-1"
         }}
 
+        self.params = {
+            "referenceFileO": "null",
+            "referenceFileH": "null",
+        }
+
 
 class PathoTyping(Process):
     """
@@ -681,6 +697,10 @@ class PathoTyping(Process):
         self.ignore_type = True
 
         self.status_channels = []
+
+        self.params = {
+            "species": "null"
+        }
 
         self.secondary_inputs = [
             {
@@ -724,6 +744,11 @@ class CheckCoverage(Process):
         self.input_type = "fastq"
         self.output_type = "fastq"
 
+        self.params = {
+            "genomeSize": 2.1,
+            "minCoverage": 15
+        }
+
         self.secondary_inputs = [
             {
                 "params": "genomeSize",
@@ -749,6 +774,10 @@ class TrueCoverage(Process):
 
         self.input_type = "fastq"
         self.output_type = "fastq"
+
+        self.params = {
+            "species": "null"
+        }
 
         self.directives = {
             "true_coverage": {
@@ -788,6 +817,10 @@ class FastQC(Process):
         list: Setting status channels for FastQC execution and FastQC report
         """
 
+        self.params = {
+            "adapters": "None"
+        }
+
         self.secondary_inputs = [
             {
                 "params": "adapters",
@@ -825,6 +858,13 @@ class Trimmomatic(Process):
         self.output_type = "fastq"
 
         self.link_end.append({"link": "SIDE_phred", "alias": "SIDE_phred"})
+
+        self.params = {
+            "trimSlidingWindow": "5:20",
+            "trimLeading": "3",
+            "trimTrailing": "3",
+            "trimMinLength": "55"
+        }
 
         self.secondary_inputs = [
             {
@@ -878,6 +918,14 @@ class FastqcTrimmomatic(Process):
 
         self.status_channels = ["STATUS_fastqc", "STATUS_fastqc_report",
                                 "STATUS_trimmomatic"]
+
+        self.params = {
+            "adapters": "None",
+            "trimSlidingWindow": "5:20",
+            "trimLeading": "3",
+            "trimTrailing": "3",
+            "trimMinLength": "55"
+        }
 
         self.secondary_inputs = [
             {
@@ -951,6 +999,13 @@ class Spades(Process):
 
         self.link_end.append({"link": "SIDE_max_len", "alias": "SIDE_max_len"})
 
+        self.params = {
+            "spadesMinCoverage": 2,
+            "spadesMinKmerCoverage": 2,
+            "spadesKmers": "'auto'",
+
+        }
+
         self.secondary_inputs = [
             {
                 "params": "spadesOpts",
@@ -990,6 +1045,12 @@ class ProcessSpades(Process):
 
         self.input_type = "fasta"
         self.output_type = "fasta"
+
+        self.params = {
+            "spadesMinKmerCoverage": 2,
+            "spadesMinContigLen": 200,
+            "spadesMaxContigs": 100
+        }
 
         self.secondary_inputs = [
             {
@@ -1039,6 +1100,12 @@ class AssemblyMapping(Process):
 
         self.link_start.append("SIDE_BpCoverage")
         self.link_end.append({"link": "__fastq", "alias": "_LAST_fastq"})
+
+        self.params = {
+            "minAssemblyCoverage": "'auto'",
+            "AMaxContigs": 100,
+            "genomeSize": 2.1
+        }
 
         self.secondary_inputs = [
             {
@@ -1139,6 +1206,11 @@ class Mlst(Process):
             "container": "ummidock/mlst",
         }}
 
+        self.params = {
+            "mlstRun": "true",
+            "mlstSpecies": "null"
+        }
+
 
 class Abricate(Process):
     """Abricate mapping process template interface
@@ -1181,6 +1253,11 @@ class Abricate(Process):
             }
         }
 
+        self.params = {
+            "abricateDatabases": '["resfinder", "card", "vfdb", '
+                                 '"plasmidfinder", "virulencefinder"]'
+        }
+
 
 class Prokka(Process):
     """Prokka mapping process template interface
@@ -1216,6 +1293,10 @@ class Prokka(Process):
                 "container": "ummidock/prokka-nf",
                 "version": "1.12.0-2"
             }
+        }
+
+        self.params = {
+            "prokkaRun": "true"
         }
 
 
@@ -1258,6 +1339,18 @@ class Chewbbaca(Process):
                 "container": "mickaelsilva/chewbbaca_py3",
                 "version": "latest"
             }
+        }
+
+        self.params = {
+            "chewbbacaRun": "true",
+            "chewbbacaQueue": "null",
+            "chewbbacaTraining": "null",
+            "schemaPath": "null",
+            "schemaSelectedLoci": "null",
+            "schemaCore": "null",
+            "chewbbacaJson": "false",
+            "chewbbacaToPhyloviz": "false",
+            "chewbbacaProfilePercentage": 0.95
         }
 
 
