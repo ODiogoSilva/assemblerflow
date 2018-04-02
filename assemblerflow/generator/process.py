@@ -53,6 +53,12 @@ class Process:
             "channel_str": "IN_fasta_raw = Channel.fromPath(params.fasta)"
                            ".map{ it -> [it.toString().tokenize('/').last()"
                            ".tokenize('.').first(), it] }"
+        },
+        "accessions": {
+            "params": "accessions",
+            "channel": "IN_accessions_raw",
+            "channel_str": "IN_accessions_raw = Channel.fromPath("
+                           "params.accessions)"
         }
     }
     """
@@ -611,6 +617,31 @@ class Init(Process):
                          **{"secondary_inputs": secondary_input_str}}
 
 
+class DownloadReads(Process):
+    """Process template interface for reads downloading from SRA and NCBI
+
+    This process is set with:
+
+        - ``input_type``: accessions
+        - ``output_type`` fastq
+
+    """
+
+    def __init__(self, **kwargs):
+
+        super().__init__(**kwargs)
+
+        self.input_type = "accessions"
+        self.output_type = "fastq"
+
+        self.directives = {"reads_download": {
+            "cpus": 1,
+            "memory": "1GB",
+            "container": "ummidock/getseqena",
+            "version": "0.4.0-2"
+        }}
+
+
 class IntegrityCoverage(Process):
     """Process template interface for first integrity_coverage process
 
@@ -873,6 +904,10 @@ class Trimmomatic(Process):
                            "Channel.value([params.trimSlidingWindow,"
                            "params.trimLeading,params.trimTrailing,"
                            "params.trimMinLength])"
+            },
+            {
+                "params": "adapters",
+                "channel": "IN_adapters = Channel.value(params.adapters)"
             }
         ]
 
