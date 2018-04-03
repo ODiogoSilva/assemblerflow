@@ -1024,6 +1024,36 @@ class Skesa(Process):
         }}
 
 
+class ProcessSkesa(Process):
+
+    def __init__(self, **kwargs):
+
+        super().__init__(**kwargs)
+
+        self.params = {
+            "skesaMinCoverage": 2,
+            "skesaMinKmerCoverage": 2,
+            "skesaKmers": "'auto'",
+        }
+
+        self.secondary_inputs = [
+            {
+                "params": "processSkesaOpts",
+                "channel": "IN_process_skesa_opts = "
+                           "Channel.value([params.skesaMinContigLen,"
+                           "params.skesaMinKmerCoverage,"
+                           "params.skesaMaxContigs])"
+            }
+        ]
+
+        self.directives = {"skesa": {
+            "cpus": 1,
+            "memory": "'2GB'",
+            "container": "ummidock/skesa",
+            "version": "0.2.0-3",
+        }}
+
+
 class Spades(Process):
     """Spades process template interface
 
@@ -1053,7 +1083,6 @@ class Spades(Process):
             "spadesMinCoverage": 2,
             "spadesMinKmerCoverage": 2,
             "spadesKmers": "'auto'",
-
         }
 
         self.secondary_inputs = [
