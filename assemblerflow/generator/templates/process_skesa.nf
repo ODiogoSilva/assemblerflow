@@ -13,6 +13,7 @@ process process_skesa_{{ pid }} {
     set fastq_id, file(assembly) from {{ input_channel }}
     val opts from IN_process_skesa_opts
     val gsize from IN_genome_size
+    val assembler from Channel.value("skesa")
 
     output:
     set fastq_id, file('*.assembly.fasta') optional true into {{ output_channel }}

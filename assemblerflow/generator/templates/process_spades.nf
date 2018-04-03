@@ -13,6 +13,7 @@ process process_spades_{{ pid }} {
     set fastq_id, file(assembly) from {{ input_channel }}
     val opts from IN_process_spades_opts
     val gsize from IN_genome_size
+    val assembler from Channel.value("spades")
 
     output:
     set fastq_id, file('*.assembly.fasta') optional true into {{ output_channel }}
