@@ -1034,9 +1034,9 @@ class ProcessSkesa(Process):
         self.output_type = "fasta"
 
         self.params = {
-            "skesaMinCoverage": 2,
             "skesaMinKmerCoverage": 2,
-            "skesaKmers": "'auto'",
+            "skesaMinContigLen": 200,
+            "skesaMaxContigs": 100
         }
 
         self.secondary_inputs = [
