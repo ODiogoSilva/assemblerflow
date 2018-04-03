@@ -4,7 +4,7 @@ process process_skesa_{{ pid }} {
     // Send POST request to platform
     {% include "post.txt" ignore missing %}
 
-    tag { fastq_id}
+    tag { fastq_id }
     // This process can only use a single CPU
     cpus 1
     publishDir "reports/assembly/skesa_filter_{{ pid }}", pattern: '*.report.csv', mode: 'copy'
@@ -16,7 +16,7 @@ process process_skesa_{{ pid }} {
     val assembler from Channel.value("skesa")
 
     output:
-    set fastq_id, file('*.fasta') optional true into {{ output_channel }}
+    set fastq_id, file('*.fasta') into {{ output_channel }}
     file '*.report.csv' optional true
     {% with task_name="process_skesa" %}
     {%- include "compiler_channels.txt" ignore missing -%}
