@@ -16,7 +16,7 @@ process process_skesa_{{ pid }} {
     val assembler from Channel.value("skesa")
 
     output:
-    set fastq_id, file('*.assembly.fasta') optional true into {{ output_channel }}
+    set fastq_id, file('*.fasta') optional true into {{ output_channel }}
     file '*.report.csv' optional true
     {% with task_name="process_skesa" %}
     {%- include "compiler_channels.txt" ignore missing -%}
