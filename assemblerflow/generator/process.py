@@ -1030,6 +1030,9 @@ class ProcessSkesa(Process):
 
         super().__init__(**kwargs)
 
+        self.input_type = "fasta"
+        self.output_type = "fasta"
+
         self.params = {
             "skesaMinCoverage": 2,
             "skesaMinKmerCoverage": 2,
