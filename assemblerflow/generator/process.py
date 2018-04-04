@@ -212,11 +212,11 @@ class Process:
 
         self.extra_input = ""
         """
-        str:  with the name of the params that will be used to provide 
+        str:  with the name of the params that will be used to provide
         extra input into the process. This extra input will be mixed with
         the main input channel using nextflow's ``mix`` operator. Its
         channel will be defined at the start of the pipeline, based on the
-        ``channel_str`` key of the :attr:`~Process.RAW_MAPPING` for the 
+        ``channel_str`` key of the :attr:`~Process.RAW_MAPPING` for the
         corresponding input type.
         """
 
