@@ -46,13 +46,13 @@ class Process:
             "params": "fastq",
             "default_value": "'fastq/*_{1,2}.*'",
             "channel": "IN_fastq_raw",
-            "channel_str": "IN_fastq_raw = Channel.fromFilePairs(params.fastq)"
+            "channel_str": "Channel.fromFilePairs(params.fastq)"
         },
         "fasta": {
             "params": "fasta",
             "default_value": "'fasta/*.fasta'",
             "channel": "IN_fasta_raw",
-            "channel_str": "IN_fasta_raw = Channel.fromPath(params.fasta)"
+            "channel_str": "Channel.fromPath(params.fasta)"
                            ".map{ it -> [it.toString().tokenize('/').last()"
                            ".tokenize('.').first(), it] }"
         },
@@ -60,7 +60,7 @@ class Process:
             "params": "accessions",
             "default_value": "null",
             "channel": "IN_accessions_raw",
-            "channel_str": "IN_accessions_raw = Channel.fromPath("
+            "channel_str": "Channel.fromPath("
                            "params.accessions)"
         }
     }

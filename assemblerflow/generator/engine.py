@@ -414,7 +414,8 @@ class NextflowGenerator:
         else:
             self.main_raw_inputs[process_input] = {
                 "channel": raw_in["channel"],
-                "channel_str": raw_in["channel_str"],
+                "channel_str": "{} = {}".format(raw_in["channel"],
+                                                raw_in["channel_str"]),
                 "raw_forks": [raw_in["input_channel"]]
             }
         logger.debug("[{}] Updated main raw inputs: {}".format(
