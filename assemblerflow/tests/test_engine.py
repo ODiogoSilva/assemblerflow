@@ -327,7 +327,7 @@ def test_set_channels_secondary_chanels_link(multi_forks):
 def test_set_secondary_inputs_single(single_con):
 
     single_con._set_channels()
-    single_con._set_secondary_inputs()
+    single_con._set_init_process()
 
     p = single_con.processes[0]
 
@@ -341,7 +341,7 @@ def test_set_secondary_inputs_single(single_con):
 def test_set_secondary_inputs_raw_forks(raw_forks):
 
     raw_forks._set_channels()
-    raw_forks._set_secondary_inputs()
+    raw_forks._set_init_process()
 
     p = raw_forks.processes[0]
 
@@ -357,7 +357,7 @@ def test_set_secondary_inputs_raw_forks(raw_forks):
 def test_set_secondary_inputs_multi_raw(single_con_multi_raw):
 
     single_con_multi_raw._set_channels()
-    single_con_multi_raw._set_secondary_inputs()
+    single_con_multi_raw._set_init_process()
 
     p = single_con_multi_raw.processes[0]
 
