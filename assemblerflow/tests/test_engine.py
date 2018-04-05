@@ -564,6 +564,22 @@ def test_extra_inputs_2():
     assert nf.processes[3].extra_input == "teste"
 
 
+def test_extra_inputs_1():
+
+    con = [{"input": {"process": "__init__", "lane": 1},
+            "output": {"process": "integrity_coverage", "lane": 1}},
+           {"input": {"process": "integrity_coverage", "lane": 1},
+            "output": {"process": "fastqc={'extra_input':'teste'}", "lane": 1}}]
+
+    nf = eg.NextflowGenerator(con, "teste.nf")
+    nf._set_channels()
+
+    assert [list(nf.extra_inputs.keys())[0],
+            nf.extra_inputs["teste"]["input_type"],
+            nf.extra_inputs["teste"]["channels"]] == \
+           ["teste", "fastq", ["EXTRA_fastqc_1_2"]]
+
+
 def test_extra_inputs_default():
 
     con = [{"input": {"process": "__init__", "lane": 1},
@@ -575,8 +591,12 @@ def test_extra_inputs_default():
            ]
 
     nf = eg.NextflowGenerator(con, "teste.nf")
+    nf._set_channels()
 
-    assert nf.processes[3].extra_input == "default"
+    assert [list(nf.extra_inputs.keys())[0],
+            nf.extra_inputs["fasta"]["input_type"],
+            nf.extra_inputs["fasta"]["channels"]] == \
+           ["fasta", "fasta", ["EXTRA_abricate_1_3"]]
 
 
 def test_extra_inputs_invalid():
