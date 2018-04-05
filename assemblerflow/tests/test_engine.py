@@ -564,7 +564,7 @@ def test_extra_inputs_2():
     assert nf.processes[3].extra_input == "teste"
 
 
-def test_extra_inputs_1():
+def test_extra_inputs_3():
 
     con = [{"input": {"process": "__init__", "lane": 1},
             "output": {"process": "integrity_coverage", "lane": 1}},
