@@ -537,6 +537,77 @@ def test_container_string_2(single_con):
                   '$procB_2.container = "img:latest"'
 
 
+def test_extra_inputs_1():
+
+    con = [{"input": {"process": "__init__", "lane": 1},
+            "output": {"process": "integrity_coverage", "lane": 1}},
+           {"input": {"process": "integrity_coverage", "lane": 1},
+            "output": {"process": "fastqc={'extra_input':'teste'}", "lane": 1}}]
+
+    nf = eg.NextflowGenerator(con, "teste.nf")
+
+    assert nf.processes[2].extra_input == "teste"
+
+
+def test_extra_inputs_2():
+
+    con = [{"input": {"process": "__init__", "lane": 1},
+            "output": {"process": "integrity_coverage", "lane": 1}},
+           {"input": {"process": "integrity_coverage", "lane": 1},
+            "output": {"process": "spades", "lane": 1}},
+           {"input": {"process": "spades", "lane": 1},
+            "output": {"process": "abricate={'extra_input':'teste'}", "lane": 1}}
+           ]
+
+    nf = eg.NextflowGenerator(con, "teste.nf")
+
+    assert nf.processes[3].extra_input == "teste"
+
+
+def test_extra_inputs_default():
+
+    con = [{"input": {"process": "__init__", "lane": 1},
+            "output": {"process": "integrity_coverage", "lane": 1}},
+           {"input": {"process": "integrity_coverage", "lane": 1},
+            "output": {"process": "spades", "lane": 1}},
+           {"input": {"process": "spades", "lane": 1},
+            "output": {"process": "abricate={'extra_input':'default'}", "lane": 1}}
+           ]
+
+    nf = eg.NextflowGenerator(con, "teste.nf")
+
+    assert nf.processes[3].extra_input == "default"
+
+
+def test_extra_inputs_invalid():
+
+    con = [{"input": {"process": "__init__", "lane": 1},
+            "output": {"process": "integrity_coverage", "lane": 1}},
+           {"input": {"process": "integrity_coverage", "lane": 1},
+            "output": {"process": "fastqc={'extra_input':'default'}", "lane": 1}}]
+
+    nf = eg.NextflowGenerator(con, "teste.nf")
+
+    with pytest.raises(SystemExit):
+        nf._set_channels()
+
+
+def test_extra_inputs_invalid_2():
+
+    con = [{"input": {"process": "__init__", "lane": 1},
+            "output": {"process": "integrity_coverage", "lane": 1}},
+           {"input": {"process": "integrity_coverage", "lane": 1},
+            "output": {"process": "spades={'extra_input':'teste'}", "lane": 1}},
+           {"input": {"process": "spades", "lane": 1},
+            "output": {"process": "abricate={'extra_input':'teste'}", "lane": 1}}
+           ]
+
+    nf = eg.NextflowGenerator(con, "teste.nf")
+
+    with pytest.raises(SystemExit):
+        nf._set_channels()
+
+
 def test_run_time_directives():
 
     con = [{"input": {"process": "__init__", "lane": 1},
