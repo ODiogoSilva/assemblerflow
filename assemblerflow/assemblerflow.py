@@ -89,7 +89,7 @@ def get_args(args=None):
     return parser.parse_args(args)
 
 
-def validate_build_arguments(args, parsed_output_nf):
+def validate_build_arguments(args):
 
     if not args.tasks and not args.recipe and not args.check_only \
             and not args.detailed_list and not args.short_list:
@@ -105,6 +105,8 @@ def validate_build_arguments(args, parsed_output_nf):
         sys.exit(1)
 
     if args.output_nf:
+        parsed_output_nf = (args.output_nf if args.output_nf.endswith(".nf")
+                            else "{}.nf".format(args.output_nf))
         opath = parsed_output_nf
         if os.path.dirname(opath):
             parent_dir = os.path.dirname(opath)
@@ -113,6 +115,8 @@ def validate_build_arguments(args, parsed_output_nf):
                     "The provided directory '{}' does not exist.".format(
                         parent_dir), "red_bold"))
                 sys.exit(1)
+
+        return  parsed_output_nf
 
 
 def copy_project(path):
@@ -161,10 +165,7 @@ def build(args):
         "============================================="
     ]
 
-    parsed_output_nf = (args.output_nf if args.output_nf.endswith(".nf")
-                        else "{}.nf".format(args.output_nf))
-
-    validate_build_arguments(args, parsed_output_nf)
+    parsed_output_nf = validate_build_arguments(args)
 
     logger.info(colored_print("\n".join(welcome), "green_bold"))
 
