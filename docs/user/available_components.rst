@@ -80,6 +80,9 @@ Reads typing
 Plasmids
 --------
 
-- :doc: `componentes/patlas_mapping`: process to generate input `JSON` file
+- :doc:`componentes/mapping_patlas`: process to generate input `JSON` file
 with mapping results for pATLAS.
+- :doc:`components/mash_screen`: process to generate input `JSON` file with
+mash screen results for pATLAS. However if a different database is provide it
+can use mash screen for other purporses.
 

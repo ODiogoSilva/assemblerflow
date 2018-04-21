@@ -1,4 +1,4 @@
-pATLAS mapping
+mapping_patlas
 ==============
 
 Purpose
@@ -65,18 +65,3 @@ Default directives
 - ``jsonDumpingMapping``:
     - ``container``: tiagofilipe12/patlasflow_mapping
     - ``version``: 1.1.2
-
-
-Advanced
---------
-
-Template
-^^^^^^^^
-
-:mod:`assemblerflow.templates.patlas_mapping`
-
-
-Reports JSON
-^^^^^^^^^^^^
-
-None.
