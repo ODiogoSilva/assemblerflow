@@ -4,7 +4,7 @@ Abricate
 Purpose
 -------
 
-This components performs anti-microbial gene screening using abricate. It
+This component performs anti-microbial gene screening using abricate. It
 includes the default databases plus the ``virulencefinder`` database.
 
 .. note::
@@ -13,7 +13,7 @@ includes the default databases plus the ``virulencefinder`` database.
 Input/Output type
 ------------------
 
-- Input type: ``Fasta`` and ``FastQ``
+- Input type: ``FastQ``
 - Output type: ``Fasta``
 
 .. note::

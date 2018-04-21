@@ -76,3 +76,10 @@ Reads typing
 - :doc:`components/patho_typing`: *In silico* pathogenic typing from raw
   illumina reads.
 
+
+Plasmids
+--------
+
+- :doc: `componentes/patlas_mapping`: process to generate input `JSON` file
+with mapping results for pATLAS.
+
