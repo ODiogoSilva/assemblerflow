@@ -83,6 +83,9 @@ Plasmids
 - :doc:`componentes/mapping_patlas`: process to generate input `JSON` file
 with mapping results for pATLAS.
 - :doc:`components/mash_screen`: process to generate input `JSON` file with
-mash screen results for pATLAS. However if a different database is provide it
+mash screen results for pATLAS. However if a different database is provided it
 can use mash screen for other purporses.
+- :doc: `components/mash_dist`: process to generate input `JSON` file with mash
+dist results for pATLAS. However if a different database is provided it can use
+mash dist for other purposes.
 
