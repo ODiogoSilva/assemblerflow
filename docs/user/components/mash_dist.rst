@@ -6,12 +6,12 @@ Purpose
 
 This component aims to produce to be a mash dist approach to find plasmids
 contained in high throughoput sequencing data. Then, the resulting file can
-be imported into .. _pATLAS: http://www.patlas.site/ .
+be imported into `pATLAS <http://www.patlas.site/>`_.
 However, this process can be user for other purposes, by providing a different
 database than the default that is intended for plasmid searches.
 
 .. note::
-    pATLAs software documentation can be found .. _here: https://tiagofilipe12.gitbooks.io/patlas/content/
+    pATLAs software documentation can be found `here <https://tiagofilipe12.gitbooks.io/patlas/content/>`_
 
 
 Input/Output type
@@ -46,7 +46,7 @@ Parameters
 Published results
 -----------------
 
-- ``results/mashdist/``: A `JSON` file that can be imported to .. _pATLAS: http://www.patlas.site/
+- ``results/mashdist/``: A `JSON` file that can be imported to `pATLAS <http://www.patlas.site/>`_
   with the results from mash dist.
 
 

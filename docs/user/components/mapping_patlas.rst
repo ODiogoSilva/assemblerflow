@@ -6,10 +6,10 @@ Purpose
 
 This component aims to produce to be a mapping approach to find plasmids
 contained in high throughoput sequencing data. Then, the resulting file can
-be imported into .. _pATLAS: http://www.patlas.site/ .
+be imported into `pATLAS <http://www.patlas.site/>`_.
 
 .. note::
-    pATLAs software documentation can be found .. _here: https://tiagofilipe12.gitbooks.io/patlas/content/
+    pATLAs software documentation can be found `here <https://tiagofilipe12.gitbooks.io/patlas/content/>`_.
 
 
 Input/Output type
@@ -43,7 +43,7 @@ Parameters
 Published results
 -----------------
 
-- ``results/mapping/``: A `JSON` file that can be imported to .. _pATLAS: http://www.patlas.site/
+- ``results/mapping/``: A `JSON` file that can be imported to `pATLAS <http://www.patlas.site/>`_
   with the results from mapping.
 
 
