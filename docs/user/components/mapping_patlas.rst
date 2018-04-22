@@ -22,21 +22,21 @@ Input/Output type
 Parameters
 ----------
 
-- `max_k`: Sets the k parameter for bowtie2 allowing to make multiple mappings
+- ``max_k``: Sets the k parameter for bowtie2 allowing to make multiple mappings
 of the same read against several hits on the query sequence or sequences.
 Default: 10949.
 
-- `trim5`: Sets trim5 option for bowtie. This will become legacy with QC
+- ``trim5``: Sets trim5 option for bowtie. This will become legacy with QC
 integration, but it enables to trim 5' end of reads to be mapped with bowtie2.
 Default: 0
 
-- `lengthJson`: A dictionary of all the lengths of reference sequences.
+- ``lengthJson``: A dictionary of all the lengths of reference sequences.
 Default: 'jsons/*_length.json' (from docker image).
 
-- `refIndex`: Specifies the reference indexes to be provided to bowtie2.
+- ``refIndex``: Specifies the reference indexes to be provided to bowtie2.
 Default: '/ngstools/data/indexes/bowtie2idx/bowtie2.idx' (from docker image).
 
-- `samtoolsIndex`: Specifies the reference indexes to be provided to samtools.
+- ``samtoolsIndex``: Specifies the reference indexes to be provided to samtools.
 Default: '/ngstools/data/indexes/fasta/samtools.fasta.fai' (from docker image).
 
 
