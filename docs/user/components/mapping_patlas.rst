@@ -4,13 +4,15 @@ mapping_patlas
 Purpose
 -------
 
-This component aims to produce to be a mapping approach to find plasmids
-contained in high throughoput sequencing data. Then, the resulting file can
-be imported into `pATLAS <http://www.patlas.site/>`_.
+This component performs mapping (using `bowtie2` and `samtools`) against a
+plasmid database in order to find
+plasmids contained in high throughoput sequencing data. Then, the resulting file
+can be imported into `pATLAS <http://www.patlas.site/>`_.
 
 .. note::
-    pATLAs software documentation can be found `here <https://tiagofilipe12.gitbooks.io/patlas/content/>`_.
-
+    pATLAs documentation can be found `here <https://tiagofilipe12.gitbooks.io/patlas/content/>`_.
+    bowtie2 documentation can be found `here <http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml>`_.
+    samtools documentation can be found `here <http://www.htslib.org/doc/samtools-1.2.html>`_.
 
 Input/Output type
 ------------------

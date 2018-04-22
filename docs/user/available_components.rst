@@ -80,14 +80,14 @@ Reads typing
 Plasmids
 --------
 
-- :doc:`components/mapping_patlas`: process to generate input `JSON` file
-  with mapping results for pATLAS.
+- :doc:`components/mapping_patlas`: Performs read mapping and generates a JSON
+  input file for pATLAS.
 
-- :doc:`components/mash_screen`: process to generate input `JSON` file with
-  mash screen results for pATLAS. However if a different database is provided it
-  can use mash screen for other purporses.
+- :doc:`components/mash_screen`: Performs mash screen against a reference index
+  plasmid database and generates a JSON input file for pATLAS. However if a different
+  database is provided it can use mash screen for other purporses.
 
-- :doc:`components/mash_dist`: process to generate input `JSON` file with mash
-  dist results for pATLAS. However if a different database is provided it can use
-  mash dist for other purposes.
+- :doc:`components/mash_dist`: Executes mash distance against a reference index
+  plasmid database and generates a `JSON` for pATLAS. However if a
+  different database is provided it can use mash dist for other purposes.
 

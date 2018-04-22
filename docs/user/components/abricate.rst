@@ -13,8 +13,8 @@ includes the default databases plus the ``virulencefinder`` database.
 Input/Output type
 ------------------
 
-- Input type: ``FastQ``
-- Output type: ``Fasta``
+- Input type: ``Fasta``
+- Output type: None
 
 .. note::
     The default input parameter for fasta data is ``--fasta``.

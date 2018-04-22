@@ -4,20 +4,22 @@ mash_dist
 Purpose
 -------
 
-This component aims to produce to be a mash dist approach to find plasmids
-contained in high throughoput sequencing data. Then, the resulting file can
+This component executes mash dist to find plasmids
+within high throughoput sequencing data, using as inputs fasta files
+(e.g. contigs). Then, the resulting file can
 be imported into `pATLAS <http://www.patlas.site/>`_.
 However, this process can be user for other purposes, by providing a different
 database than the default that is intended for plasmid searches.
 
 .. note::
-    pATLAs software documentation can be found `here <https://tiagofilipe12.gitbooks.io/patlas/content/>`_
+    pATLAs documentation can be found `here <https://tiagofilipe12.gitbooks.io/patlas/content/>`_.
+    MASH documentation can be found `here <https://mash.readthedocs.io/en/latest/>`_.
 
 
 Input/Output type
 ------------------
 
-- Input type: ``FastA``
+- Input type: ``Fasta``
 - Output type: ``JSON``
 
 
