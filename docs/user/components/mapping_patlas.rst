@@ -10,9 +10,9 @@ plasmids contained in high throughoput sequencing data. Then, the resulting file
 can be imported into `pATLAS <http://www.patlas.site/>`_.
 
 .. note::
-    pATLAs documentation can be found `here <https://tiagofilipe12.gitbooks.io/patlas/content/>`_.
-    bowtie2 documentation can be found `here <http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml>`_.
-    samtools documentation can be found `here <http://www.htslib.org/doc/samtools-1.2.html>`_.
+    - pATLAs documentation can be found `here <https://tiagofilipe12.gitbooks.io/patlas/content/>`_.
+    - bowtie2 documentation can be found `here <http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml>`_.
+    - samtools documentation can be found `here <http://www.htslib.org/doc/samtools-1.2.html>`_.
 
 Input/Output type
 ------------------

@@ -12,8 +12,8 @@ However, this process can be user for other purposes, by providing a different
 database than the default that is intended for plasmid searches.
 
 .. note::
-    pATLAs documentation can be found `here <https://tiagofilipe12.gitbooks.io/patlas/content/>`_.
-    MASH documentation can be found `here <https://mash.readthedocs.io/en/latest/>`_.
+    - pATLAs documentation can be found `here <https://tiagofilipe12.gitbooks.io/patlas/content/>`_.
+    - MASH documentation can be found `here <https://mash.readthedocs.io/en/latest/>`_.
 
 
 Input/Output type
