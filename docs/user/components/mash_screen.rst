@@ -8,6 +8,8 @@ This component performes mash screen to find plasmids
 contained in high throughoput sequencing data, using as inputs read files
 (FastQ files). Then, the resulting file can
 be imported into `pATLAS <http://www.patlas.site/>`_.
+This component searches for containment of a given sequence in read sequencing
+data.
 However, this process can be user for other purposes, by providing a different
 database than the default that is intended for plasmid searches.
 

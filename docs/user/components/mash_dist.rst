@@ -8,6 +8,8 @@ This component executes mash dist to find plasmids
 within high throughoput sequencing data, using as inputs fasta files
 (e.g. contigs). Then, the resulting file can
 be imported into `pATLAS <http://www.patlas.site/>`_.
+This component calculates pairwise distances between sequences
+(one from the database and the query sequence).
 However, this process can be user for other purposes, by providing a different
 database than the default that is intended for plasmid searches.
 

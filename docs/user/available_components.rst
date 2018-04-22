@@ -84,10 +84,14 @@ Plasmids
   input file for pATLAS.
 
 - :doc:`components/mash_screen`: Performs mash screen against a reference index
-  plasmid database and generates a JSON input file for pATLAS. However if a different
+  plasmid database and generates a JSON input file for pATLAS. This component
+  searches for containment of a given sequence in read sequencing data.
+  However if a different
   database is provided it can use mash screen for other purporses.
 
 - :doc:`components/mash_dist`: Executes mash distance against a reference index
-  plasmid database and generates a `JSON` for pATLAS. However if a
+  plasmid database and generates a `JSON` for pATLAS. This component calculates
+  pairwise distances between sequences (one from the database and the query
+  sequence). However if a
   different database is provided it can use mash dist for other purposes.
 
