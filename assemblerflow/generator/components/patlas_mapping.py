@@ -35,7 +35,7 @@ class PatlasMapping(Process):
                                "covered by reads (in absolute lenght)."
             },
             "refIndex": {
-                "default": "'/ngstools/data/indexes/bowtie2idx/bowtie2.idx'",
+                "default": "'/ngstools/data/indexes/bowtie2idx/bowtie2'",
                 "description": "Specifies the reference indexes to be provided"
                                " to bowtie2."
             },
