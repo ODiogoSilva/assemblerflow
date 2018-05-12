@@ -112,9 +112,14 @@ class NextflowInspector:
         log file. This is used to parse the file only when it has changed.
         """
 
+        self.pipeline_tag = ""
+        """
+        str: Tag of the pipeline, parsed from .nextflow.log
+        """
+
         self.pipeline_name = ""
         """
-        str: Name of the pipeline, parsed from .nextflow.log
+        str: Name of the nextflow pipeline file.
         """
 
         self.run_status = ""
@@ -123,7 +128,13 @@ class NextflowInspector:
         'error', 'complete'.
         """
 
-        self.broadcast_address = "http://localhost:8000/inspect/api/status"
+        self.app_address = "http://localhost:8000/"
+        """
+        str: Address of assemblerflow web app
+        """
+
+        self.broadcast_address = "{}inspect/api/status".format(
+            self.app_address)
         """
         str: Address of the REST api where the information will be sent
         """
@@ -337,8 +348,12 @@ class NextflowInspector:
 
                 # Retrieves the pipeline name from the string
                 if re.match(".*Launching `.*` \[.*\] ", line):
-                    match = re.match(".*Launching `.*` \[(.*)\] ", line)
-                    self.pipeline_name = match.group(1)
+                    tag_match = re.match(".*Launching `.*` \[(.*)\] ", line)
+                    self.pipeline_tag = tag_match.group(1) if tag_match else \
+                        "?"
+                    name_match = re.match(".*Launching `(.*)` \[.*\] ", line)
+                    self.pipeline_name = name_match.group(1) if name_match \
+                        else "?"
 
         self.content_lines = len(self.processes)
 
@@ -606,7 +621,6 @@ class NextflowInspector:
                 self._update_trace_info(fields, hm)
 
         self._update_process_stats()
-        self._update_pipeline_status()
         self._update_barrier_status()
 
     def log_parser(self):
@@ -647,6 +661,8 @@ class NextflowInspector:
 
                     p["barrier"] = "R"
                     p["submitted"].add(sample)
+
+        self._update_pipeline_status()
 
     def update_inspection(self):
         """Wrapper method that calls the appropriate main updating methods of
@@ -776,7 +792,7 @@ class NextflowInspector:
 
         # Add static header
         header = "Pipeline [{}] inspection at {}. Status: ".format(
-            self.pipeline_name, strftime("%Y-%m-%d %H:%M:%S", gmtime()))
+            self.pipeline_tag, strftime("%Y-%m-%d %H:%M:%S", gmtime()))
 
         win.addstr(0, 0, header)
         win.addstr(0, len(header), self.run_status,
@@ -879,10 +895,14 @@ class NextflowInspector:
     def _send_status_info(self, run_id):
 
         status_json = {
-            "processStats": self.process_stats,
+            "tableStats": self.process_stats,
+            "tableHeader": ["Process", "Running", "Complete", "Error",
+                            "Avg Time", "Max Mem", "Avg Read", "Avg Write"],
             "processInfo": self._convert_process_dict(),
+            "pipelineTag": self.pipeline_tag,
             "pipelineName": self.pipeline_name,
-            "runStatus": self.run_status
+            "runStatus": self.run_status,
+            "processes": list(self.processes)
         }
 
         try:
@@ -945,10 +965,16 @@ class NextflowInspector:
 
         return pipeline_hash.hexdigest() + time_hash.hexdigest()
 
+    def _print_msg(self, run_id):
+
+        inspect_address = "{}inspect/{}".format(self.app_address, run_id)
+        print(inspect_address)
+
     def broadcast_status(self):
 
         run_hash = self._get_run_hash()
         self._establish_connection(run_hash)
+        self._print_msg(run_hash)
 
         stay_alive = True
         try:
