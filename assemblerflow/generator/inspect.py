@@ -892,12 +892,55 @@ class NextflowInspector:
 
         return d
 
+    def _prepare_table_data(self):
+
+        # Set header
+        header = ["Process", "Running", "Complete", "Error", "Avg Time",
+                  "Max Mem", "Avg Read", "Avg Write"]
+
+        # Set data mappings
+        mappings = {
+            "Running": "running",
+            "Complete": "complete",
+            "Error": "error",
+            "Avg Time": "avgTime",
+            "Max Mem": "maxMem",
+            "Avg Read": "avgRead",
+            "Avg Write": "avgWrite"
+        }
+
+        # Set table data
+        data = []
+        for p, process in enumerate(list(self.processes)):
+            if process not in self.process_stats:
+                data.append({
+                    **{"process": process},
+                    **dict((x, "-") for x in mappings.values())
+                })
+            else:
+                ref = self.process_stats[process]
+                proc = self.processes[process]
+                data.append({
+                    "process": process,
+                    "complete": list(ref["completed"]),
+                    "error": list(proc["failed"]),
+                    "running": list(proc["submitted"]),
+                    "avgTime": ref["realtime"],
+                    "maxMem": ref["maxmem"],
+                    "avgread": ref["avgread"],
+                    "avgwrite": ref["avgwrite"]
+                })
+
+        return header, mappings, data
+
     def _send_status_info(self, run_id):
 
+        header, mappings, data = self._prepare_table_data()
+
         status_json = {
-            "tableStats": self.process_stats,
-            "tableHeader": ["Process", "Running", "Complete", "Error",
-                            "Avg Time", "Max Mem", "Avg Read", "Avg Write"],
+            "tableHeader": header,
+            "tableData": data,
+            "tableMappings": mappings,
             "processInfo": self._convert_process_dict(),
             "pipelineTag": self.pipeline_tag,
             "pipelineName": self.pipeline_name,
