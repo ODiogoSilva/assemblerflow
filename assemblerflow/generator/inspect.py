@@ -927,8 +927,8 @@ class NextflowInspector:
                     "running": list(proc["submitted"]),
                     "avgTime": ref["realtime"],
                     "maxMem": ref["maxmem"],
-                    "avgread": ref["avgread"],
-                    "avgwrite": ref["avgwrite"]
+                    "avgRead": ref["avgread"],
+                    "avgWrite": ref["avgwrite"]
                 })
 
         return header, mappings, data
