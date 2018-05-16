@@ -900,6 +900,7 @@ class NextflowInspector:
 
         # Set data mappings
         mappings = {
+            "Process": "process",
             "Running": "running",
             "Complete": "complete",
             "Error": "error",
