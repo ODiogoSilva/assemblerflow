@@ -922,7 +922,7 @@ class NextflowInspector:
                 proc = self.processes[process]
                 data.append({
                     "process": process,
-                    "complete": list(ref["completed"]),
+                    "complete": list(proc["finished"]),
                     "error": list(proc["failed"]),
                     "running": list(proc["submitted"]),
                     "avgTime": ref["realtime"],
