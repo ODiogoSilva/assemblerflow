@@ -912,25 +912,34 @@ class NextflowInspector:
 
         # Set table data
         data = []
+        table_headers = ["avgTime", "maxMem", "avgRead", "avgWrite"]
         for p, process in enumerate(list(self.processes)):
+
+            proc = self.processes[process]
+            current_data = {
+                "process": process,
+                "complete": list(proc["finished"]),
+                "error": list(proc["failed"]),
+                "running": list(proc["submitted"])
+            }
+
             if process not in self.process_stats:
-                data.append({
-                    **{"process": process},
-                    **dict((x, "-") for x in mappings.values())
-                })
+                current_data = {
+                    **current_data,
+                    **dict((x, "-") for x in table_headers),
+                }
+
             else:
                 ref = self.process_stats[process]
-                proc = self.processes[process]
-                data.append({
-                    "process": process,
-                    "complete": list(proc["finished"]),
-                    "error": list(proc["failed"]),
-                    "running": list(proc["submitted"]),
-                    "avgTime": ref["realtime"],
-                    "maxMem": ref["maxmem"],
-                    "avgRead": ref["avgread"],
-                    "avgWrite": ref["avgwrite"]
-                })
+                current_data = {
+                    **current_data,
+                    **{"avgTime": ref["realtime"],
+                     "maxMem": ref["maxmem"],
+                     "avgRead": ref["avgread"],
+                     "avgWrite": ref["avgwrite"]}
+                }
+
+            data.append(current_data)
 
         return header, mappings, data
 
