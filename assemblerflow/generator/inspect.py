@@ -45,6 +45,8 @@ def signal_handler(screen):
 
 class NextflowInspector:
 
+    MAX_RETRIES = 100
+
     def __init__(self, trace_file, refresh_rate, pretty=False):
 
         self.trace_file = trace_file
@@ -115,6 +117,20 @@ class NextflowInspector:
         self.pipeline_tag = ""
         """
         str: Tag of the pipeline, parsed from .nextflow.log
+        """
+
+        self.log_retry = 0
+        """
+        int: Each time the log file is not found, this counter is 
+        increased. Only when it matches the :attr:`MAX_RETRIES` attribute
+        does it raises a FileNotFoundError.
+        """
+
+        self.trace_retry = 0
+        """
+        int: Each time the log file is not found, this counter is 
+        increased. Only when it matches the :attr:`MAX_RETRIES` attribute
+        does it raises a FileNotFoundError.
         """
 
         self.pipeline_name = ""
@@ -622,6 +638,7 @@ class NextflowInspector:
 
         self._update_process_stats()
         self._update_barrier_status()
+        self.trace_retry = 0
 
     def log_parser(self):
         """Method that parses the nextflow log file once and updates the
@@ -663,6 +680,7 @@ class NextflowInspector:
                     p["submitted"].add(sample)
 
         self._update_pipeline_status()
+        self.log_retry = 0
 
     def update_inspection(self):
         """Wrapper method that calls the appropriate main updating methods of
@@ -674,8 +692,18 @@ class NextflowInspector:
         change, and they ignore entries that have been previously processes.
         """
 
-        self.log_parser()
-        self.trace_parser()
+        try:
+            self.log_parser()
+        except FileNotFoundError:
+            self.log_retry += 1
+            if self.log_retry == self.MAX_RETRIES:
+                raise FileNotFoundError
+        try:
+            self.trace_parser()
+        except FileNotFoundError:
+            self.trace_retry += 1
+            if self.trace_retry == self.MAX_RETRIES:
+                raise FileNotFoundError
 
     #################
     # CURSES METHODS
