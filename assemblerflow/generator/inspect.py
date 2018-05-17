@@ -1041,11 +1041,11 @@ class NextflowInspector:
                 sleep(self.refresh_rate)
 
         except FileNotFoundError:
-            sys.stderr.write(colored_print(
+            logger.error(colored_print(
                 "ERROR: nextflow log and/or trace files are no longer "
                 "reachable!", "red_bold"))
         except Exception as e:
-            sys.stderr.write(str(e))
+            logger.error(str(e))
         finally:
             logger.info("Closing connection")
             self._close_connection(run_hash)
