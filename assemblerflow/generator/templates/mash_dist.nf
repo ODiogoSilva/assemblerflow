@@ -6,7 +6,7 @@ process runMashDist_{{ pid }} {
 
     tag { "running mash dist for fasta file: " + fasta }
 
-    publishDir 'results/mashdist_{{ pid }}/'
+    publishDir 'results/mashdist/mashdist_{{ pid }}/'
 
     input:
     set sample_id, file(fasta) from {{ input_channel }}
@@ -32,7 +32,7 @@ process mashDistOutputJson_{{ pid }} {
 
     tag { "dumping json file from: " + mashtxt }
 
-    publishDir 'results/mashdist_{{ pid }}/'
+    publishDir 'results/mashdist/mashdist_json_{{ pid }}/'
 
     input:
     set sample_id, fasta, file(mashtxt) from mashDistOutChannel_{{ pid }}
