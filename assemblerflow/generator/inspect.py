@@ -922,12 +922,10 @@ class NextflowInspector:
 
     def _prepare_table_data(self):
 
-        # Set header
-        header = ["Process", "Running", "Complete", "Error", "Avg Time",
-                  "Max Mem", "Avg Read", "Avg Write"]
 
         # Set data mappings
         mappings = {
+            "Barrier": "barrier",
             "Process": "process",
             "Running": "running",
             "Complete": "complete",
@@ -944,13 +942,17 @@ class NextflowInspector:
         for p, process in enumerate(list(self.processes)):
 
             proc = self.processes[process]
+            # Add general data that is always available for all processes
             current_data = {
                 "process": process,
+                "barrier": proc["barrier"],
                 "complete": list(proc["finished"]),
                 "error": list(proc["failed"]),
                 "running": list(proc["submitted"])
             }
 
+            # Add stats data that is only available for processes that have
+            # finished once.
             if process not in self.process_stats:
                 current_data = {
                     **current_data,
@@ -969,14 +971,13 @@ class NextflowInspector:
 
             data.append(current_data)
 
-        return header, mappings, data
+        return mappings, data
 
     def _send_status_info(self, run_id):
 
-        header, mappings, data = self._prepare_table_data()
+        mappings, data = self._prepare_table_data()
 
         status_json = {
-            "tableHeader": header,
             "tableData": data,
             "tableMappings": mappings,
             "processInfo": self._convert_process_dict(),
