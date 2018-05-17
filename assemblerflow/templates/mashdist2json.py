@@ -43,7 +43,7 @@ if __file__.endswith(".command.sh"):
     logger.debug("HASH_CUTOFF: {}".format(HASH_CUTOFF))
 
 
-def send_to_output(master_dict, last_seq, mash_output):
+def send_to_output(master_dict, mash_output):
     """Send dictionary to output json file
     This function sends master_dict dictionary to a json file if master_dict is
     populated with entries, otherwise it won't create the file
@@ -67,8 +67,8 @@ def send_to_output(master_dict, last_seq, mash_output):
     """
     # create a new file only if master_dict is populated
     if master_dict:
-        out_file = open("{}_{}.json".format(
-            "".join(mash_output.split(".")[0]), last_seq), "w")
+        out_file = open("{}.json".format(
+            "".join(mash_output.split(".")[0])), "w")
         out_file.write(json.dumps(master_dict))
         out_file.close()
 
