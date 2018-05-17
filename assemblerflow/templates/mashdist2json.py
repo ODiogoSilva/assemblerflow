@@ -23,8 +23,8 @@ Code documentation
 
 """
 
-__version__ = "1.1.1"
-__build__ = "03042018"
+__version__ = "1.2.0"
+__build__ = "17052018"
 __template__ = "mashsdist2json-nf"
 
 import os
@@ -121,7 +121,8 @@ def main(mash_output, hash_cutoff):
 
             # then if last_seq is equal to current_seq write to dict
             if last_seq == current_seq:
-                master_dict[ref_accession] = [1 - float(mash_dist), perc_hashes]
+                master_dict[ref_accession] = [1 - float(mash_dist), perc_hashes,
+                                              current_seq]
 
             last_seq = current_seq
 
