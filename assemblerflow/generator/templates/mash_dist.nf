@@ -6,6 +6,8 @@ process runMashDist_{{ pid }} {
 
     tag { "running mash dist for fasta file: " + fasta }
 
+    publishDir 'results/mashdist_{{ pid }}/'
+
     input:
     set sample_id, file(fasta) from {{ input_channel }}
     val refFile from IN_reference_file

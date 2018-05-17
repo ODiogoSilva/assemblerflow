@@ -10,6 +10,8 @@ process mashScreen_{{ pid }} {
 
     tag { "running mash screen for sample: " + sample_id }
 
+    publishDir 'results/mashscreen_{{ pid }}/'
+
     input:
     set sample_id, file(reads) from {{ input_channel }}
     val refFile from IN_reference_file
