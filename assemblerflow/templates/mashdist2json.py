@@ -108,23 +108,8 @@ def main(mash_output, hash_cutoff):
         # reported to json file
         if perc_hashes > float(hash_cutoff):
 
-            #if last_seq != current_seq and counter > 0:
-                # create a new file only if master_dict is populated
-                #send_to_output(master_dict, mash_output)
-                #master_dict = {}
-                #counter = 0
-
-            # if counter = 0 last_seq should be updated before the next if statement
-            #if counter == 0:
-            #    counter += 1
-                #last_seq = current_seq
-
-            # then if last_seq is equal to current_seq write to dict
-            #if last_seq == current_seq:
             master_dict[ref_accession] = [1 - float(mash_dist), perc_hashes,
                                               current_seq]
-
-            #last_seq = current_seq
 
     # assures that file is closed in last iteration of the loop
     send_to_output(master_dict, mash_output)
