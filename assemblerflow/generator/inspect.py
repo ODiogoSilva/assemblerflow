@@ -45,7 +45,7 @@ def signal_handler(screen):
 
 class NextflowInspector:
 
-    MAX_RETRIES = 100
+    MAX_RETRIES = 1000
 
     def __init__(self, trace_file, refresh_rate, pretty=False):
 
@@ -605,6 +605,7 @@ class NextflowInspector:
         # Check the timestamp of the tracefile. Only proceed with the parsing
         # if it changed from the previous time.
         size_stamp = os.path.getsize(self.trace_file)
+        self.trace_retry = 0
         if size_stamp and size_stamp == self.trace_sizestamp:
             return
         else:
@@ -638,7 +639,6 @@ class NextflowInspector:
 
         self._update_process_stats()
         self._update_barrier_status()
-        self.trace_retry = 0
 
     def log_parser(self):
         """Method that parses the nextflow log file once and updates the
@@ -648,6 +648,7 @@ class NextflowInspector:
         # Check the timestamp of the log file. Only proceed with the parsing
         # if it changed from the previous time.
         size_stamp = os.path.getsize(self.log_file)
+        self.log_retry = 0
         if size_stamp and size_stamp == self.log_sizestamp:
             return
         else:
@@ -680,7 +681,6 @@ class NextflowInspector:
                     p["submitted"].add(sample)
 
         self._update_pipeline_status()
-        self.log_retry = 0
 
     def update_inspection(self):
         """Wrapper method that calls the appropriate main updating methods of
@@ -694,16 +694,16 @@ class NextflowInspector:
 
         try:
             self.log_parser()
-        except FileNotFoundError:
+        except FileNotFoundError as e:
             self.log_retry += 1
             if self.log_retry == self.MAX_RETRIES:
-                raise FileNotFoundError
+                raise e
         try:
             self.trace_parser()
-        except FileNotFoundError:
+        except FileNotFoundError as e:
             self.trace_retry += 1
             if self.trace_retry == self.MAX_RETRIES:
-                raise FileNotFoundError
+                raise e
 
     #################
     # CURSES METHODS
