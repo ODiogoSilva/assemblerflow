@@ -127,7 +127,7 @@ def main(mash_output, hash_cutoff):
             #last_seq = current_seq
 
     # assures that file is closed in last iteration of the loop
-    send_to_output(master_dict, last_seq, mash_output)
+    send_to_output(master_dict, mash_output)
 
 
 if __name__ == "__main__":
