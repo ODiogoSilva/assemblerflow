@@ -1056,7 +1056,9 @@ class NextflowInspector:
                        "cpuhour": ref["cpuhour"],
                        "maxMem": ref["maxmem"],
                        "avgRead": ref["avgread"],
-                       "avgWrite": ref["avgwrite"]}
+                       "avgWrite": ref["avgwrite"],
+                       "cpuWarn": ref["cpu_warnings"],
+                       "memWarn": ref["mem_warnings"]}
                 }
 
             data.append(current_data)
