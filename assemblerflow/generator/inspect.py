@@ -359,7 +359,8 @@ class NextflowInspector:
                             "submitted": set(),
                             "finished": set(),
                             "failed": set(),
-                            "retry": set()
+                            "retry": set(),
+                            "cpus": None
                         }
 
                 # Retrieves the pipeline name from the string
@@ -520,6 +521,40 @@ class NextflowInspector:
         self.trace_info[process].append(info)
         self.stored_ids.append(info["hash"])
 
+    def _update_process_resources(self, process, vals):
+        """Updates the resources info in :attr:`processes` dictionary.
+        """
+
+        resources = ["cpus"]
+
+        for r in resources:
+            if not self.processes[process][r]:
+                self.processes[process][r] = vals[0]["cpus"]
+
+    def _cpu_load_parser(self, cpus, cpu_per, t):
+        """Parses the cpu load from the number of cpus and its usage
+        percentage and returnsde cpu/hour measure
+
+        Parameters
+        ----------
+        cpus : str
+            Number of cpus allocated.
+        cpu_per : str
+            Percentage of cpu load measured (e.g.: 200,5%).
+        t : str
+            The time string can be something like '20s', '1m30s' or '300ms'.
+        """
+
+        try:
+            _cpus = float(cpus)
+            _cpu_per = float(cpu_per.replace(",", ".").replace("%", ""))
+            hours = self._hms(t) / 60 / 24
+
+            return ((_cpu_per / (100 * _cpus)) * _cpus) * hours
+
+        except ValueError:
+            return 0
+
     def _update_process_stats(self):
         """Updates the process stats with the information from the processes
 
@@ -532,7 +567,11 @@ class NextflowInspector:
 
         for process, vals in self.trace_info.items():
 
+            # Update submission status of tags for each process
             vals = self._update_tag_status(process, vals)
+
+            # Update process resources
+            self._update_process_resources(process, vals)
 
             self.process_stats[process] = {}
 
@@ -551,6 +590,12 @@ class NextflowInspector:
             mean_time = round(sum(time_array) / len(time_array), 1)
             mean_time_str = strftime('%H:%M:%S', gmtime(mean_time))
             inst["realtime"] = mean_time_str
+
+            # Get cumulative cpu/hours
+            cpu_hours = [self._cpu_load_parser(x["cpus"], x["%cpu"],
+                                               x["realtime"])
+                         for x in vals]
+            inst["cpuhour"] = round(sum(cpu_hours), 2)
 
             # Get cumulated time
             # cum_time_str = strftime('%H:%M:%S', gmtime(
@@ -931,6 +976,7 @@ class NextflowInspector:
             "Complete": "complete",
             "Error": "error",
             "Avg Time": "avgTime",
+            "CPU/hour": "cpuhour",
             "Max Mem": "maxMem",
             "Avg Read": "avgRead",
             "Avg Write": "avgWrite"
@@ -938,7 +984,7 @@ class NextflowInspector:
 
         # Set table data
         data = []
-        table_headers = ["avgTime", "maxMem", "avgRead", "avgWrite"]
+        table_headers = ["avgTime", "cpuhour", "maxMem", "avgRead", "avgWrite"]
         for p, process in enumerate(list(self.processes)):
 
             proc = self.processes[process]
@@ -964,9 +1010,10 @@ class NextflowInspector:
                 current_data = {
                     **current_data,
                     **{"avgTime": ref["realtime"],
-                     "maxMem": ref["maxmem"],
-                     "avgRead": ref["avgread"],
-                     "avgWrite": ref["avgwrite"]}
+                       "cpuhour": ref["cpuhour"],
+                       "maxMem": ref["maxmem"],
+                       "avgRead": ref["avgread"],
+                       "avgWrite": ref["avgwrite"]}
                 }
 
             data.append(current_data)
@@ -1034,7 +1081,7 @@ class NextflowInspector:
         # Get name of the pipeline from the log file
         with open(self.log_file) as fh:
             header = fh.readline()
-        pipeline_path = re.match(".*nextflow run ([^\s]+) .*", header).group(1)
+        pipeline_path = re.match(".*nextflow run ([^\s]+).*", header).group(1)
 
         # Get hash from the entire pipeline file
         pipeline_hash = hashlib.md5()
