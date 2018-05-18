@@ -555,6 +555,54 @@ class NextflowInspector:
         except ValueError:
             return 0
 
+    def _assess_resource_warnings(self, process, vals):
+        """Assess whether the cpu load or memory usage is above the allocation
+
+        Parameters
+        ----------
+        process : str
+            Process name
+        vals : vals
+            List of trace information for each tag of that process
+
+        Returns
+        -------
+        cpu_warnings : dict
+            Keys are tags and values are the excessive cpu load
+        mem_warnings : dict
+            Keys are tags and values are the excessive rss
+        """
+
+        cpu_warnings = {}
+        mem_warnings = {}
+
+        for i in vals:
+            try:
+                expected_load = float(i["cpus"]) * 100
+                cpu_load = float(i["%cpu"].replace(",", ".").replace("%", ""))
+
+                if expected_load * 0.9 > cpu_load > expected_load * 1.10:
+                    cpu_warnings[i["tag"]] = {
+                        "expected":  expected_load,
+                        "value": cpu_load
+                    }
+            except ValueError:
+                pass
+
+            try:
+                rss = self._size_coverter(i["rss"])
+                mem_allocated = self._size_coverter(i["memory"])
+
+                if rss > mem_allocated * 1.10:
+                    mem_warnings[i["tag"]] = {
+                        "expected": mem_allocated,
+                        "value": rss
+                    }
+            except ValueError:
+                pass
+
+        return cpu_warnings, mem_warnings
+
     def _update_process_stats(self):
         """Updates the process stats with the information from the processes
 
@@ -581,10 +629,6 @@ class NextflowInspector:
             inst["completed"] = "{}".format(
                 len([x for x in vals if x["status"] in good_status]))
 
-            # Get number of bad samples
-            # inst["bad_samples"] = "{}".format(
-            #     len([x for x in vals if x["status"] not in good_status]))
-
             # Get average time
             time_array = [self._hms(x["realtime"]) for x in vals]
             mean_time = round(sum(time_array) / len(time_array), 1)
@@ -597,10 +641,9 @@ class NextflowInspector:
                          for x in vals]
             inst["cpuhour"] = round(sum(cpu_hours), 2)
 
-            # Get cumulated time
-            # cum_time_str = strftime('%H:%M:%S', gmtime(
-            #     round(sum(time_array), 1)))
-            # inst["cumtime"] = cum_time_str
+            # Assess resource warnings
+            inst["cpu_warnings"], inst["mem_warnings"] = \
+                self._assess_resource_warnings(process, vals)
 
             # Get maximum memory
             rss_values = [self._size_coverter(x["rss"]) for x in vals
