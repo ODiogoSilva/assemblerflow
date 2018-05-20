@@ -6,6 +6,7 @@ import signal
 import locale
 import logging
 import hashlib
+import datetime
 import requests
 
 from os.path import join, abspath
@@ -89,6 +90,12 @@ class NextflowInspector:
         .nextflow.log file in the :func:`_parser_pipeline_processes` method
         and updated in the :func:`_update_barrier_status` and 
         :func:`_update_process_stats` and :func:`_update_submission_status`.
+        """
+
+        self.process_tags = {}
+        """
+        dict: Dictionary of processes with summary information for each tag
+        it processes
         """
 
         self.samples = []
@@ -748,25 +755,32 @@ class NextflowInspector:
             for line in fh:
                 if "Submitted process >" in line or \
                         "Re-submitted process >" in line:
-                    m = re.match(".*process > (.*) \((.*)\).*", line)
+                    m = re.match(".*\[(.*)\].*process > (.*) \((.*)\).*", line)
                     if not m:
                         continue
 
-                    process = m.group(1)
-                    sample = m.group(2)
+                    workdir = m.group(1)
+                    process = m.group(2)
+                    tag = m.group(3)
 
                     if process not in self.processes:
                         continue
                     p = self.processes[process]
-                    if sample in list(p["finished"]) + list(p["retry"]):
+                    if tag in list(p["finished"]) + list(p["retry"]):
                         continue
-                    if sample in list(p["failed"]) and \
+                    if tag in list(p["failed"]) and \
                             "Re-submitted process >" in line:
-                        p["retry"].add(sample)
+                        p["retry"].add(tag)
                         continue
 
                     p["barrier"] = "R"
-                    p["submitted"].add(sample)
+                    p["submitted"].add(tag)
+                    self.process_tags[process] = {
+                        tag: {
+                            "workdir": self._expand_path(workdir),
+                            "start": str(datetime.datetime.now())
+                        }
+                    }
 
         self._update_pipeline_status()
 
@@ -1010,7 +1024,6 @@ class NextflowInspector:
 
     def _prepare_table_data(self):
 
-
         # Set data mappings
         mappings = {
             "Barrier": "barrier",
@@ -1046,6 +1059,7 @@ class NextflowInspector:
                 current_data = {
                     **current_data,
                     **dict((x, "-") for x in table_headers),
+                    **{"cpuWarn": {}, "memWarn": {}}
                 }
 
             else:
@@ -1073,6 +1087,7 @@ class NextflowInspector:
             "tableData": data,
             "tableMappings": mappings,
             "processInfo": self._convert_process_dict(),
+            "processTags": self.process_tags,
             "pipelineTag": self.pipeline_tag,
             "pipelineName": self.pipeline_name,
             "runStatus": self.run_status,
