@@ -8,6 +8,7 @@ import logging
 import hashlib
 import datetime
 import requests
+import json
 
 from dateutil import parser
 from os.path import join, abspath
@@ -1200,10 +1201,32 @@ class NextflowInspector:
                 "connection.", "red_bold"))
             sys.exit(1)
 
-    def _establish_connection(self, run_id):
+
+    def _dag_file_to_dict(self):
+        """Function that opens the dotfile named .treeDag.json in the current
+        working directory
+
+        Returns
+        -------
+        Returns a dictionary with the dag object to be used in the post instance
+        available through the method _establish_connection
+
+        """
+        try:
+            dag_file = open(os.path.join(self.workdir, ".treeDag.json"))
+            dag_json = json.load(dag_file)
+        except (FileNotFoundError, json.decoder.JSONDecodeError):
+            logger.warning(colored_print("WARNING: dotfile named .treeDag.json "
+                                         "not found or corrupted", "red_bold"))
+            dag_json = {}
+
+        return dag_json
+
+    def _establish_connection(self, run_id, dict_dag):
 
         try:
-            r = requests.post(self.broadcast_address, json={"run_id": run_id})
+            r = requests.post(self.broadcast_address,
+                              json={"run_id": run_id, "dag_json": dict_dag})
             if r.status_code != 201:
                 logger.error(colored_print(
                     "ERROR: There was a problem sending data to the server"
@@ -1257,7 +1280,8 @@ class NextflowInspector:
     def broadcast_status(self):
 
         run_hash = self._get_run_hash()
-        self._establish_connection(run_hash)
+        dict_dag = self._dag_file_to_dict()
+        self._establish_connection(run_hash, dict_dag)
         self._print_msg(run_hash)
 
         stay_alive = True
