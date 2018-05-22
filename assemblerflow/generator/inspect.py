@@ -179,6 +179,14 @@ class NextflowInspector:
         'error', 'complete'.
         """
 
+        self.abort_cause = None
+        """
+        str or None: When :attr:`run_status` is "aborted", this attribute
+        will contain the reason provided in the nextflow log. When this
+        attribute is not None, it will also trigger the sending of the
+        final lines of the nextflow log to broadcast.
+        """
+
         self.app_address = "http://localhost:8000/"
         """
         str: Address of assemblerflow web app
@@ -420,6 +428,7 @@ class NextflowInspector:
         self.time_stop = None
         self.execution_command = None
         self.nextflow_version = None
+        self.abort_cause = None
         # Clean up of tag running status
         for p in self.processes.values():
             p["barrier"] = "W"
@@ -457,11 +466,19 @@ class NextflowInspector:
 
                 if "Session aborted" in line:
                     self.run_status = "aborted"
+                    # Get abort cause
+                    try:
+                        self.abort_cause = re.match(
+                            ".*Cause: (.*)", line).group(1)
+                    except AttributeError:
+                        self.abort_cause = "Unknown"
+                    # Get time of pipeline stop
                     time_str = " ".join(line.split()[:2])
                     self.time_stop = parser.parse(time_str)
                     return
                 if "Execution complete -- Goodbye" in line:
                     self.run_status = "complete"
+                    # Get time of pipeline stop
                     time_str = " ".join(line.split()[:2])
                     self.time_stop = parser.parse(time_str)
                     return
@@ -1172,11 +1189,44 @@ class NextflowInspector:
             }
         ]
 
+    def _get_log_lines(self, n=300):
+        """Returns a list with the last ``n`` lines of the nextflow log file
+
+        Parameters
+        ----------
+        n : int
+            Number of last lines from the log file
+
+        Returns
+        -------
+        list
+            List of strings with the nextflow log
+        """
+
+        with open(self.log_file) as fh:
+            last_lines = fh.readlines()[-n:]
+
+        return last_lines
+
+    def _prepare_run_status_data(self):
+
+        if self.run_status == "aborted":
+            log_lines = self._get_log_lines()
+        else:
+            log_lines = None
+
+        return {
+            "value": self.run_status,
+            "abortCause": self.abort_cause,
+            "logLines": log_lines
+        }
+
     def _send_status_info(self, run_id):
 
         mappings, data = self._prepare_table_data()
         overview_data = self._prepare_overview_data()
         general_details = self._prepare_general_details()
+        status_data = self._prepare_run_status_data()
 
         status_json = {
             "generalOverview": overview_data,
@@ -1185,7 +1235,7 @@ class NextflowInspector:
             "tableMappings": mappings,
             "processInfo": self._convert_process_dict(),
             "processTags": self.process_tags,
-            "runStatus": self.run_status,
+            "runStatus": status_data,
             "timeStart": str(self.time_start),
             "timeStop": str(self.time_stop) if self.time_stop else "-",
             "processes": list(self.processes)
@@ -1200,7 +1250,6 @@ class NextflowInspector:
                 " may be down or there is a problem with your internet "
                 "connection.", "red_bold"))
             sys.exit(1)
-
 
     def _dag_file_to_dict(self):
         """Function that opens the dotfile named .treeDag.json in the current
