@@ -9,6 +9,7 @@ import hashlib
 import datetime
 import requests
 
+from dateutil import parser
 from os.path import join, abspath
 from time import gmtime, strftime, sleep
 from collections import defaultdict, OrderedDict
@@ -143,6 +144,32 @@ class NextflowInspector:
         self.pipeline_name = ""
         """
         str: Name of the nextflow pipeline file.
+        """
+
+        self.time_start = None
+        """
+        datetime.time object with the starting time of the pipeline.
+        """
+
+        self.time_stop = None
+        """
+        datetime.time object with the finish time of the pipeline. This 
+        attribute is only set when the pipeline is not running.
+        """
+
+        self.workdir = os.getcwd()
+        """
+        str: Path to the pipeline work directory
+        """
+
+        self.execution_command = None
+        """
+        str: The command used to execute the pipeline
+        """
+
+        self.nextflow_version = None
+        """
+        str: Nextflow's version string, as retrieved from the log file.
         """
 
         self.run_status = ""
@@ -388,6 +415,10 @@ class NextflowInspector:
         self.process_stats = {}
         self.samples = []
         self.stored_ids = []
+        self.time_start = None
+        self.time_stop = None
+        self.execution_command = None
+        self.nextflow_version = None
         # Clean up of tag running status
         for p in self.processes.values():
             p["barrier"] = "W"
@@ -401,12 +432,37 @@ class NextflowInspector:
 
         with open(self.log_file) as fh:
 
+            first_line = next(fh)
+            time_str = " ".join(first_line.split()[:2])
+            self.time_start = parser.parse(time_str)
+
+            if not self.execution_command:
+                try:
+                    self.execution_command = re.match(
+                        ".*nextflow run (.*)", first_line).group(1)
+                except AttributeError:
+                    self.execution_command = "Unknown"
+
             for line in fh:
+
+                if "DEBUG nextflow.cli.CmdRun" in line:
+                    if not self.nextflow_version:
+                        try:
+                            vline = next(fh)
+                            self.nextflow_version = re.match(
+                                ".*Version: (.*)", vline).group(1)
+                        except AttributeError:
+                            self.nextflow_version = "Unknown"
+
                 if "Session aborted" in line:
                     self.run_status = "aborted"
+                    time_str = " ".join(line.split()[:2])
+                    self.time_stop = parser.parse(time_str)
                     return
                 if "Execution complete -- Goodbye" in line:
                     self.run_status = "complete"
+                    time_str = " ".join(line.split()[:2])
+                    self.time_stop = parser.parse(time_str)
                     return
 
         if self.run_status not in ["running", ""]:
@@ -796,13 +852,13 @@ class NextflowInspector:
 
         try:
             self.log_parser()
-        except FileNotFoundError as e:
+        except (FileNotFoundError, StopIteration) as e:
             self.log_retry += 1
             if self.log_retry == self.MAX_RETRIES:
                 raise e
         try:
             self.trace_parser()
-        except FileNotFoundError as e:
+        except (FileNotFoundError, StopIteration) as e:
             self.trace_retry += 1
             if self.trace_retry == self.MAX_RETRIES:
                 raise e
@@ -1079,18 +1135,58 @@ class NextflowInspector:
 
         return mappings, data
 
+    def _prepare_overview_data(self):
+
+        return [
+            {
+                "header": "Pipeline name",
+                "value": self.pipeline_name
+            },
+            {
+                "header": "Pipeline tag",
+                "value": self.pipeline_tag
+            },
+            {
+                "header": "Number of processes",
+                "value": len(self.processes)
+            }]
+
+    def _prepare_general_details(self):
+        return [
+            {
+                "header": "Pipeline directory",
+                "value": self.workdir
+            },
+            {
+                "header": "Work directory",
+                "value": join(self.workdir, "work")
+            },
+            {
+                "header": "Nextflow command",
+                "value": self.execution_command
+            },
+            {
+                "header": "Nextflow version",
+                "value": self.nextflow_version
+            }
+        ]
+
     def _send_status_info(self, run_id):
 
         mappings, data = self._prepare_table_data()
+        overview_data = self._prepare_overview_data()
+        general_details = self._prepare_general_details()
 
         status_json = {
+            "generalOverview": overview_data,
+            "generalDetails": general_details,
             "tableData": data,
             "tableMappings": mappings,
             "processInfo": self._convert_process_dict(),
             "processTags": self.process_tags,
-            "pipelineTag": self.pipeline_tag,
-            "pipelineName": self.pipeline_name,
             "runStatus": self.run_status,
+            "timeStart": str(self.time_start),
+            "timeStop": str(self.time_stop) if self.time_stop else "-",
             "processes": list(self.processes)
         }
 
@@ -1148,11 +1244,10 @@ class NextflowInspector:
         with open(pipeline_path, "rb") as fh:
             for chunk in iter(lambda: fh.read(4096), b""):
                 pipeline_hash.update(chunk)
-        # Get hash from the pipeline start time stamp
-        t = header.split()[1]
-        time_hash = hashlib.md5(t.encode("utf8"))
+        # Get hash from the current working dir
+        dir_hash = hashlib.md5(self.workdir.encode("utf8"))
 
-        return pipeline_hash.hexdigest() + time_hash.hexdigest()
+        return pipeline_hash.hexdigest() + dir_hash.hexdigest()
 
     def _print_msg(self, run_id):
 
@@ -1181,7 +1276,7 @@ class NextflowInspector:
                 "ERROR: nextflow log and/or trace files are no longer "
                 "reachable!", "red_bold"))
         except Exception as e:
-            logger.error(str(e))
+            logger.error("ERROR: ", e)
         finally:
             logger.info("Closing connection")
             self._close_connection(run_hash)
