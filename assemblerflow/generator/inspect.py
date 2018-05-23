@@ -50,7 +50,7 @@ class NextflowInspector:
 
     MAX_RETRIES = 1000
 
-    def __init__(self, trace_file, refresh_rate, pretty=False):
+    def __init__(self, trace_file, refresh_rate, pretty=False, ip_addr=None):
 
         self.trace_file = trace_file
         """
@@ -187,10 +187,13 @@ class NextflowInspector:
         final lines of the nextflow log to broadcast.
         """
 
-        self.app_address = "http://localhost:8000/"
-        """
-        str: Address of assemblerflow web app
-        """
+        if not ip_addr:
+            self.app_address = "http://localhost:8000/"
+        else:
+            self.app_address = ip_addr
+            """
+            str: Address of assemblerflow web app
+            """
 
         self.broadcast_address = "{}inspect/api/status".format(
             self.app_address)
