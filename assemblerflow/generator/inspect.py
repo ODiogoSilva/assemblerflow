@@ -405,6 +405,7 @@ class NextflowInspector:
                             "retry": set(),
                             "cpus": None
                         }
+                        self.process_tags[process] = {}
 
                 # Retrieves the pipeline name from the string
                 if re.match(".*Launching `.*` \[.*\] ", line):
@@ -778,7 +779,6 @@ class NextflowInspector:
         if size_stamp and size_stamp == self.trace_sizestamp:
             return
         else:
-            self.send = True
             self.trace_sizestamp = size_stamp
 
         with open(self.trace_file) as fh:
@@ -805,6 +805,7 @@ class NextflowInspector:
 
                 # Parse trace entry and update status_info attribute
                 self._update_trace_info(fields, hm)
+                self.send = True
 
         self._update_process_stats()
         self._update_barrier_status()
@@ -822,7 +823,6 @@ class NextflowInspector:
             return
         else:
             self.log_sizestamp = size_stamp
-            self.send = True
 
         with open(self.log_file) as fh:
 
@@ -845,16 +845,17 @@ class NextflowInspector:
                     if tag in list(p["failed"]) and \
                             "Re-submitted process >" in line:
                         p["retry"].add(tag)
+                        self.send = True
                         continue
 
                     p["barrier"] = "R"
-                    p["submitted"].add(tag)
-                    self.process_tags[process] = {
-                        tag: {
+                    if tag not in p["submitted"]:
+                        p["submitted"].add(tag)
+                        self.process_tags[process][tag] = {
                             "workdir": self._expand_path(workdir),
                             "start": str(datetime.datetime.now())
                         }
-                    }
+                        self.send = True
 
         self._update_pipeline_status()
 
