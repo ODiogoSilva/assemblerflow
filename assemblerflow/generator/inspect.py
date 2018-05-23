@@ -476,12 +476,14 @@ class NextflowInspector:
                     # Get time of pipeline stop
                     time_str = " ".join(line.split()[:2])
                     self.time_stop = parser.parse(time_str)
+                    self.send = True
                     return
                 if "Execution complete -- Goodbye" in line:
                     self.run_status = "complete"
                     # Get time of pipeline stop
                     time_str = " ".join(line.split()[:2])
                     self.time_stop = parser.parse(time_str)
+                    self.send = True
                     return
 
         if self.run_status not in ["running", ""]:
