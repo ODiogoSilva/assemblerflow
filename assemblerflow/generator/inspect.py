@@ -437,6 +437,7 @@ class NextflowInspector:
         """Clears inspect attributes when re-executing a pipeline"""
 
         self.trace_info = defaultdict(list)
+        self.process_tags = {}
         self.process_stats = {}
         self.samples = []
         self.stored_ids = []
@@ -554,6 +555,7 @@ class NextflowInspector:
                 if v["status"] in good_status:
                     p["retry"].remove(tag)
                     p["failed"].remove(tag)
+                    del self.process_tags[process][tag]["log"]
 
             elif v["status"] in good_status:
                 p["finished"].add(tag)
@@ -625,6 +627,13 @@ class NextflowInspector:
 
         # Get information from a single line of trace file
         info = dict((column, fields[pos]) for column, pos in hm.items())
+
+        # The headers that will be used to populate the process_
+        process_tag_headers = ["realtime", "rss", "rchar", "wchar"]
+
+        for h in process_tag_headers:
+            if h in info and info["tag"] != "-":
+                self.process_tags[process][info["tag"]][h] = info[h]
 
         if info["hash"] in self.stored_ids:
             return
