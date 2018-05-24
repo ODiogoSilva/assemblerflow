@@ -529,6 +529,8 @@ class NextflowInspector:
                 if v["status"] in good_status:
                     p["finished"].add(tag)
                 else:
+                    self.process_tags[process][tag]["log"] = \
+                        self._retrieve_log(join(v["work_dir"], ".command.log"))
                     p["failed"].add(tag)
 
             # It the process/tag is in the retry list and it completed
@@ -569,6 +571,26 @@ class NextflowInspector:
                         # Updates process channel to complete
                         if process in self.processes:
                             self.processes[process]["barrier"] = "C"
+
+    @staticmethod
+    def _retrieve_log(path):
+        """Method used to retrieve the contents of a log file into a list.
+
+        Parameters
+        ----------
+        path
+
+        Returns
+        -------
+        list or None
+            Contents of the provided file, each line as a list entry
+        """
+
+        if not os.path.exists(path):
+            return None
+
+        with open(path) as fh:
+            return fh.readlines()
 
     def _update_trace_info(self, fields, hm):
         """Parses a trace line and updates the :attr:`status_info` attribute.
