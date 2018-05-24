@@ -1365,18 +1365,27 @@ class NextflowInspector:
     def _print_msg(self, run_id):
 
         inspect_address = "{}inspect/{}".format(self.app_address, run_id)
-        print(inspect_address)
+        logger.info(colored_print(
+            "Starting broadcast. You can see the pipeline progress on the "
+            "link below:", "green_bold"))
+        logger.info("{}".format(inspect_address))
 
     def broadcast_status(self):
 
+        logger.info(colored_print("Preparing broadcast data...", "green_bold"))
+
         run_hash = self._get_run_hash()
         dict_dag = self._dag_file_to_dict()
+        _broadcast_sent = False
         self._establish_connection(run_hash, dict_dag)
-        self._print_msg(run_hash)
 
         stay_alive = True
         try:
             while stay_alive:
+
+                if not _broadcast_sent:
+                    self._print_msg(run_hash)
+                    _broadcast_sent = True
 
                 self.update_inspection()
                 if self.send:
