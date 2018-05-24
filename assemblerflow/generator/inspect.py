@@ -75,6 +75,12 @@ class NextflowInspector:
         to skip them when parsing the trace files multiple times.
         """
 
+        self.stored_log_ids = []
+        """
+        list: Stores the time stamps of the log file lines that were already
+        parsed. It is used to skip parsing the log files multilpe times
+        """
+
         self.trace_info = defaultdict(list)
         """
         dict: Main object that stores the status information for each process
@@ -434,6 +440,7 @@ class NextflowInspector:
         self.process_stats = {}
         self.samples = []
         self.stored_ids = []
+        self.stored_log_ids = []
         self.time_start = None
         self.time_stop = None
         self.execution_command = None
@@ -873,6 +880,11 @@ class NextflowInspector:
                     workdir = m.group(2)
                     process = m.group(3)
                     tag = m.group(4)
+
+                    if time_start not in self.stored_ids:
+                        self.stored_ids.append(time_start)
+                    else:
+                        continue
 
                     if process not in self.processes:
                         continue
