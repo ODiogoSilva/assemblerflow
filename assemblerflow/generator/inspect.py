@@ -1279,7 +1279,7 @@ class NextflowInspector:
         self._c += 1
         logger.debug("Payload [{}] sent with size: {}".format(
             self._c,
-            asizeof.asizeof(status_json)
+            asizeof.asizeof(json.dumps(status_json))
         ))
 
         try:
