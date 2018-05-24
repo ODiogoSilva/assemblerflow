@@ -11,6 +11,7 @@ import requests
 import json
 
 from dateutil import parser
+from pympler import asizeof
 from os.path import join, abspath
 from time import gmtime, strftime, sleep
 from collections import defaultdict, OrderedDict
@@ -1278,7 +1279,7 @@ class NextflowInspector:
         self._c += 1
         logger.debug("Payload [{}] sent with size: {}".format(
             self._c,
-            sys.getsizeof(status_json)
+            asizeof.asizeof(status_json)
         ))
 
         try:
