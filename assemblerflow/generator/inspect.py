@@ -201,6 +201,11 @@ class NextflowInspector:
         str: Address of the REST api where the information will be sent
         """
 
+        self._c = 0
+        """
+        Counter of payloads sent, for debug purposes
+        """
+
         self.send = True
         """
         boolean: This attribute will be set to False after sending a request
@@ -433,6 +438,7 @@ class NextflowInspector:
         self.execution_command = None
         self.nextflow_version = None
         self.abort_cause = None
+        self._c = 0
         # Clean up of tag running status
         for p in self.processes.values():
             p["barrier"] = "W"
@@ -1268,6 +1274,12 @@ class NextflowInspector:
             "timeStop": str(self.time_stop) if self.time_stop else "-",
             "processes": list(self.processes)
         }
+
+        self._c += 1
+        logger.debug("Payload [{}] sent with size: {}".format(
+            self._c,
+            sys.getsizeof(status_json)
+        ))
 
         try:
             requests.put(self.broadcast_address,
