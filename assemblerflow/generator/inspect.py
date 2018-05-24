@@ -858,18 +858,21 @@ class NextflowInspector:
         else:
             self.log_sizestamp = size_stamp
 
+        r = ".* (.*) \[.*\].*\[(.*)\].*process > (.*) \((.*)\).*"
+
         with open(self.log_file) as fh:
 
             for line in fh:
                 if "Submitted process >" in line or \
                         "Re-submitted process >" in line:
-                    m = re.match(".*\[(.*)\].*process > (.*) \((.*)\).*", line)
+                    m = re.match(r, line)
                     if not m:
                         continue
 
-                    workdir = m.group(1)
-                    process = m.group(2)
-                    tag = m.group(3)
+                    time_start = m.group(1)
+                    workdir = m.group(2)
+                    process = m.group(3)
+                    tag = m.group(4)
 
                     if process not in self.processes:
                         continue
@@ -887,7 +890,7 @@ class NextflowInspector:
                         p["submitted"].add(tag)
                         self.process_tags[process][tag] = {
                             "workdir": self._expand_path(workdir),
-                            "start": str(datetime.datetime.now())
+                            "start": time_start
                         }
                         self.send = True
 
