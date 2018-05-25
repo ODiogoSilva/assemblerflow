@@ -637,7 +637,11 @@ class NextflowInspector:
         process_tag_headers = ["realtime", "rss", "rchar", "wchar"]
         for h in process_tag_headers:
             if h in info and info["tag"] != "-":
-                self.process_tags[process][info["tag"]][h] = info[h]
+                if h != "realtime" and info[h] != "-":
+                    self.process_tags[process][info["tag"]][h] = \
+                        round(self._size_coverter(info[h]), 2)
+                else:
+                    self.process_tags[process][info["tag"]][h] = info[h]
 
         # Set allocated cpu and memory information to process
         if "cpus" in info and not self.processes[process]["cpus"]:
