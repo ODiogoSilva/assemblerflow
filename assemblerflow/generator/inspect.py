@@ -506,6 +506,10 @@ class NextflowInspector:
 
         if self.run_status not in ["running", ""]:
             self._clear_inspect()
+            # Take a break to allow nextflow to restart before refreshing
+            # pipeine processes
+            sleep(5)
+            self._get_pipeline_processes()
 
         self.run_status = "running"
 
@@ -890,8 +894,8 @@ class NextflowInspector:
                     process = m.group(3)
                     tag = m.group(4)
 
-                    if time_start not in self.stored_ids:
-                        self.stored_ids.append(time_start)
+                    if time_start not in self.stored_log_ids:
+                        self.stored_log_ids.append(time_start)
                     else:
                         continue
 
@@ -1316,22 +1320,58 @@ class NextflowInspector:
                 "connection.", "red_bold"))
             sys.exit(1)
 
+    def _prepare_static_info(self):
+        """Prepares the first batch of information, containing static
+        information such as the pipeline file, and configuration files
+
+        Returns
+        -------
+        dict
+            Dict with the static information for the first POST request
+        """
+
+        pipeline_files = {}
+
+        with open(join(self.workdir, self.pipeline_name)) as fh:
+            pipeline_files["pipelineFile"] = fh.readlines()
+
+        nf_config = join(self.workdir, "nextflow.config")
+        if os.path.exists(nf_config):
+            with open(nf_config) as fh:
+                pipeline_files["configFile"] = fh.readlines()
+
+        # Check for specific assemblerflow configurations files
+        configs = {
+            "params.config": "paramsFile",
+            "resources.config": "resourcesFile",
+            "containers.config": "containersFile",
+            "user.config": "userFile",
+        }
+        for config, key in configs.items():
+            cfile = join(self.workdir, config)
+            if os.path.exists(cfile):
+                with open(cfile) as fh:
+                    pipeline_files[key] = fh.readlines()
+
+        return pipeline_files
+
     def _dag_file_to_dict(self):
         """Function that opens the dotfile named .treeDag.json in the current
         working directory
 
         Returns
         -------
-        Returns a dictionary with the dag object to be used in the post instance
-        available through the method _establish_connection
+        Returns a dictionary with the dag object to be used in the post
+        instance available through the method _establish_connection
 
         """
         try:
             dag_file = open(os.path.join(self.workdir, ".treeDag.json"))
             dag_json = json.load(dag_file)
         except (FileNotFoundError, json.decoder.JSONDecodeError):
-            logger.warning(colored_print("WARNING: dotfile named .treeDag.json "
-                                         "not found or corrupted", "red_bold"))
+            logger.warning(colored_print(
+                "WARNING: dotfile named .treeDag.json not found or corrupted",
+                "red_bold"))
             dag_json = {}
 
         return dag_json
@@ -1339,12 +1379,17 @@ class NextflowInspector:
     def _establish_connection(self, run_id, dict_dag):
 
         try:
+
+            static_info = self._prepare_static_info()
+
             r = requests.post(self.broadcast_address,
-                              json={"run_id": run_id, "dag_json": dict_dag})
+                              json={"run_id": run_id, "dag_json": dict_dag,
+                                    "pipeline_files": static_info})
             if r.status_code != 201:
                 logger.error(colored_print(
                     "ERROR: There was a problem sending data to the server"
                     "with reason: {}".format(r.reason)))
+                sys.exit(1)
         except requests.exceptions.ConnectionError:
             logger.error(colored_print(
                 "ERROR: Could not establish connection with server. The server"
@@ -1423,7 +1468,7 @@ class NextflowInspector:
                 "ERROR: nextflow log and/or trace files are no longer "
                 "reachable!", "red_bold"))
         except Exception as e:
-            logger.error("ERROR: ", e)
+            logger.error("ERROR: ", sys.exc_info()[0])
         finally:
             logger.info("Closing connection")
             self._close_connection(run_hash)
