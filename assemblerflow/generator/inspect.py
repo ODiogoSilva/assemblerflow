@@ -418,7 +418,8 @@ class NextflowInspector:
                             "finished": set(),
                             "failed": set(),
                             "retry": set(),
-                            "cpus": None
+                            "cpus": None,
+                            "memory": None
                         }
                         self.process_tags[process] = {}
 
@@ -632,12 +633,18 @@ class NextflowInspector:
         # Get information from a single line of trace file
         info = dict((column, fields[pos]) for column, pos in hm.items())
 
-        # The headers that will be used to populate the process_
+        # The headers that will be used to populate the process
         process_tag_headers = ["realtime", "rss", "rchar", "wchar"]
-
         for h in process_tag_headers:
             if h in info and info["tag"] != "-":
                 self.process_tags[process][info["tag"]][h] = info[h]
+
+        # Set allocated cpu and memory information to process
+        if "cpus" in info and not self.processes[process]["cpus"]:
+            self.processes[process]["cpus"] = info["cpus"]
+        if "memory" in info and not self.processes[process]["memory"]:
+            self.processes[process]["memory"] = self._size_coverter(
+                info["memory"])
 
         if info["hash"] in self.stored_ids:
             return
@@ -1153,7 +1160,11 @@ class NextflowInspector:
         d = {}
 
         for k, v in self.processes.items():
-            d[k] = {"barrier": v["barrier"]}
+            d[k] = {
+                "barrier": v["barrier"],
+                "cpus": v["cpus"],
+                "memory": v["memory"]
+            }
             for i in ["submitted", "finished", "failed", "retry"]:
                 d[k][i] = list(v[i])
 
