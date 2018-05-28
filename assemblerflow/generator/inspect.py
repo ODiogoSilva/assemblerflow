@@ -548,7 +548,7 @@ class NextflowInspector:
                 p["submitted"].remove(tag)
                 if v["status"] in good_status:
                     p["finished"].add(tag)
-                else:
+                elif v["status"] == "FAILED":
                     self.process_tags[process][tag]["log"] = \
                         self._retrieve_log(join(v["work_dir"], ".command.log"))
                     p["failed"].add(tag)
