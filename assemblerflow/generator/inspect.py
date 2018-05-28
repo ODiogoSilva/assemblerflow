@@ -561,6 +561,8 @@ class NextflowInspector:
                     p["retry"].remove(tag)
                     p["failed"].remove(tag)
                     del self.process_tags[process][tag]["log"]
+                elif self.run_status == "aborted":
+                    p["retry"].remove(tag)
 
             elif v["status"] in good_status:
                 p["finished"].add(tag)
