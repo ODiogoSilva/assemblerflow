@@ -303,12 +303,15 @@ class NextflowInspector:
             Path to working directory of the hash string
         """
 
-        first_hash, second_hash = hash_str.split("/")
-        first_hash_path = join(abspath("work"), first_hash)
+        try:
+            first_hash, second_hash = hash_str.split("/")
+            first_hash_path = join(abspath("work"), first_hash)
 
-        for l in os.listdir(first_hash_path):
-            if l.startswith(second_hash):
-                return join(first_hash_path, l)
+            for l in os.listdir(first_hash_path):
+                if l.startswith(second_hash):
+                    return join(first_hash_path, l)
+        except FileNotFoundError:
+            return None
 
     @staticmethod
     def _hms(s):
@@ -897,7 +900,8 @@ class NextflowInspector:
 
             for line in fh:
                 if "Submitted process >" in line or \
-                        "Re-submitted process >" in line:
+                        "Re-submitted process >" in line or \
+                        "Cached process >" in line:
                     m = re.match(r, line)
                     if not m:
                         continue
@@ -907,8 +911,8 @@ class NextflowInspector:
                     process = m.group(3)
                     tag = m.group(4)
 
-                    if time_start not in self.stored_log_ids:
-                        self.stored_log_ids.append(time_start)
+                    if time_start + tag not in self.stored_log_ids:
+                        self.stored_log_ids.append(time_start + tag)
                     else:
                         continue
 
@@ -947,12 +951,14 @@ class NextflowInspector:
         try:
             self.log_parser()
         except (FileNotFoundError, StopIteration) as e:
+            logger.debug("ERROR: ", sys.exc_info()[0])
             self.log_retry += 1
             if self.log_retry == self.MAX_RETRIES:
                 raise e
         try:
             self.trace_parser()
         except (FileNotFoundError, StopIteration) as e:
+            logger.debug("ERROR: ", sys.exc_info()[0])
             self.trace_retry += 1
             if self.trace_retry == self.MAX_RETRIES:
                 raise e
