@@ -285,7 +285,9 @@ class NextflowInspector:
             Mapping the column ID to its position (e.g.: {"tag":2})
         """
 
-        return dict((x, pos) for pos, x in enumerate(header.split("\t")))
+        return dict(
+            (x.strip(), pos) for pos, x in enumerate(header.split("\t"))
+        )
 
     @staticmethod
     def _expand_path(hash_str):
