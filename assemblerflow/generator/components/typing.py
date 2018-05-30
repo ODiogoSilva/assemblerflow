@@ -126,7 +126,7 @@ class Sistr(Process):
 
     def __init__(self, **kwargs):
 
-        super().__init__(kwargs)
+        super().__init__(**kwargs)
 
         self.input_type = "fasta"
         self.output_type = None
