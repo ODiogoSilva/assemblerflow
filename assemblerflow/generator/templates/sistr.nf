@@ -5,7 +5,7 @@ process sistr_{{ pid }} {
     {% include "post.txt" ignore missing %}
 
     tag { sample_id }
-    publishDir 'results/typing/sistr_{{ pid }}'
+    publishDir 'results/typing/sistr_{{ pid }}', pattern: ".tab", mode: "copy"
 
     input:
     set sample_id, file(assembly) from {{ input_channel }}
@@ -17,7 +17,20 @@ process sistr_{{ pid }} {
 
     script:
     """
-    sistr --qc -vv -t $task.cpus -f json -o ${sample_id}_sistr.json ${assembly}
+    {
+        sistr --qc -vv -t $task.cpus -f json -o ${sample_id}_sistr.tab ${assembly}
+        json_str="{'typing':{'sistr':'\$(awk \"FNR == 2\" *.tab | cut -f14)'}}"
+        echo \$json_str > .report.json
+
+        if [ -s ${sample_id}_sistr.tab ${assembly} ];
+        then
+            echo pass > .status
+        else
+            echo fail > .status
+
+    } || {
+        echo fail > .status
+    }
     """
 
 }
