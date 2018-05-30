@@ -11,7 +11,7 @@ process sistr_{{ pid }} {
     set sample_id, file(assembly) from {{ input_channel }}
 
     output:
-    {% with task_name="skesa" %}
+    {% with task_name="sistr" %}
     {%- include "compiler_channels.txt" ignore missing -%}
     {% endwith %}
 
