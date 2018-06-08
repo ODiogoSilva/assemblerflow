@@ -517,12 +517,7 @@ class Innuendo(Recipe):
         }
 
 
-available_recipes = {
-    "innuendo": Innuendo
-}
-
-
-def brew_recipe(args):
+def brew_recipe(args, available_recipes):
     """Brews a given list of processes according to the recipe
 
     Parameters

@@ -15,7 +15,7 @@ try:
     from __init__ import __version__, __build__
     from generator.engine import NextflowGenerator, process_map
     from generator.inspect import NextflowInspector
-    from generator.recipe import brew_recipe
+    from generator.recipe import brew_recipe, Innuendo
     from generator.pipeline_parser import parse_pipeline, SanityError
     from generator.process_details import proc_collector, colored_print
     import generator.error_handling as eh
@@ -23,7 +23,7 @@ except ImportError:
     from flowcraft import __version__, __build__
     from flowcraft.generator.engine import NextflowGenerator, process_map
     from flowcraft.generator.inspect import NextflowInspector
-    from flowcraft.generator.recipe import brew_recipe
+    from flowcraft.generator.recipe import brew_recipe, Innuendo
     from flowcraft.generator.pipeline_parser import parse_pipeline, \
         SanityError
     from flowcraft.generator.process_details import proc_collector, \
@@ -31,6 +31,12 @@ except ImportError:
     import flowcraft.generator.error_handling as eh
 
 logger = logging.getLogger("main")
+
+available_recipes = {
+    "innuendo": Innuendo,
+    "plasmid_detection": "integrity_coverage fastqc_trimmomatic (spades pilon "
+              "(mash_dist | abricate) | mash_screen | mapping_patlas)",
+}
 
 
 def get_args(args=None):
@@ -199,7 +205,12 @@ def build(args):
     # If a recipe is specified, build pipeline based on the
     # appropriate recipe
     if args.recipe:
-        pipeline_string, list_processes = brew_recipe(args)
+        if args.recipe == "innuendo":
+            pipeline_string, list_processes = brew_recipe(args,
+                                                          available_recipes)
+        else:
+            pipeline_string = available_recipes[args.recipe]
+            list_processes = None
     else:
         pipeline_string = args.tasks
         list_processes = None
