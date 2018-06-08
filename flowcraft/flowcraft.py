@@ -32,10 +32,15 @@ except ImportError:
 
 logger = logging.getLogger("main")
 
+# A dictionary of quick recipes
 available_recipes = {
     "innuendo": Innuendo,
-    "plasmid_detection": "integrity_coverage fastqc_trimmomatic (spades pilon "
+    "plasmids": "integrity_coverage fastqc_trimmomatic (spades pilon "
               "(mash_dist | abricate) | mash_screen | mapping_patlas)",
+    "plasmids_mapping": "integrity_coverage fastqc_trimmomatic mapping_patlas",
+    "plasmids_assembly": "integrity_coverage fastqc_trimmomatic (spades pilon "
+                         "(mash_dist | abricate))",
+    "plasmids_mash": "integrity_coverage fastqc_trimmomatic mash_screen",
 }
 
 
@@ -83,6 +88,12 @@ def get_args(args=None):
         "-l", "--short-list", action="store_const", dest="short_list",
         const=True, help="Print a short list of the currently "
                          "available processes")
+    build_parser.add_argument("-cr", "--check-recipe", dest="check_recipe",
+                              action="store_const", const=True,
+                              help="Check tasks that the recipe contain and "
+                                   "their flow. This option might be useful "
+                                   "if a user wants to change some components "
+                                   "of a given recipe, by using the -t option.")
 
     # GENERAL OPTIONS
     parser.add_argument(
@@ -131,7 +142,8 @@ def validate_build_arguments(args):
             "-l, -L", "red_bold"))
         sys.exit(1)
 
-    if (args.tasks or args.recipe) and not args.output_nf:
+    if (args.tasks or args.recipe) and not args.check_recipe \
+            and not args.output_nf:
         logger.error(colored_print(
             "Please provide the path and name of the pipeline file using the"
             " -o option.", "red_bold"))
@@ -211,6 +223,11 @@ def build(args):
         else:
             pipeline_string = available_recipes[args.recipe]
             list_processes = None
+        if args.check_recipe:
+            logger.info(colored_print("Pipeline string for recipe: {}"
+                                      .format(args.recipe), "purple_bold"))
+            logger.info(pipeline_string)
+            sys.exit(0)
     else:
         pipeline_string = args.tasks
         list_processes = None
