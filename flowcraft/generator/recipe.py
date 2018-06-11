@@ -512,7 +512,7 @@ class Innuendo(Recipe):
             "mlst": [False, "pilon", "abricate|prokka|chewbbaca|sistr"],
             "sistr": [True, "mlst", None],
             "abricate": [True, "mlst", None],
-            "prokka": [True, "mlst", None],
+            #"prokka": [True, "mlst", None],
             "chewbbaca": [True, "mlst", None]
         }
 
