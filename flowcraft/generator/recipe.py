@@ -495,7 +495,8 @@ class Innuendo(Recipe):
         # The description of the processes
         # [forkable, input_process, output_process]
         self.process_descriptions = {
-            "reads_download": [True, None,"integrity_coverage|seq_typing|patho_typing"],
+            "reads_download": [True, None,
+                               "integrity_coverage|seq_typing|patho_typing"],
             "patho_typing": [True, None, None],
             "seq_typing": [True, None, None],
             "integrity_coverage": [True, None, "fastqc_trimmomatic"],
@@ -550,8 +551,6 @@ def brew_recipe(args, available_recipes):
     else:
         input_processes = args.tasks
 
-    # Get the list of processes for that recipe
-    list_processes = automatic_pipeline.get_process_info()
     # Validate the provided pipeline processes
     validated = automatic_pipeline.validate_pipeline(input_processes)
     if not validated:
@@ -559,4 +558,4 @@ def brew_recipe(args, available_recipes):
     # Get the final pipeline string
     pipeline_string = automatic_pipeline.run_auto_pipeline(input_processes)
 
-    return pipeline_string, list_processes
+    return pipeline_string

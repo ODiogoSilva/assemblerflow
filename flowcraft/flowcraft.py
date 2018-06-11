@@ -38,8 +38,8 @@ available_recipes = {
     "plasmids": "integrity_coverage fastqc_trimmomatic (spades pilon "
               "(mash_dist | abricate) | mash_screen | mapping_patlas)",
     "plasmids_mapping": "integrity_coverage fastqc_trimmomatic mapping_patlas",
-    "plasmids_assembly": "integrity_coverage fastqc_trimmomatic (spades pilon "
-                         "(mash_dist | abricate))",
+    "plasmids_assembly": "integrity_coverage fastqc_trimmomatic (spades pilon"
+                         " mash_dist)",
     "plasmids_mash": "integrity_coverage fastqc_trimmomatic mash_screen",
 }
 
@@ -218,11 +218,16 @@ def build(args):
     # appropriate recipe
     if args.recipe:
         if args.recipe == "innuendo":
-            pipeline_string, list_processes = brew_recipe(args,
+            pipeline_string = brew_recipe(args,
                                                           available_recipes)
         else:
             pipeline_string = available_recipes[args.recipe]
-            list_processes = None
+            if args.tasks:
+                logger.warning(colored_print(
+                    "-t parameter will be ignored for recipe: {}\n"
+                        .format(args.recipe), "yellow_bold")
+                )
+
         if args.check_recipe:
             logger.info(colored_print("Pipeline string for recipe: {}"
                                       .format(args.recipe), "purple_bold"))
@@ -230,10 +235,9 @@ def build(args):
             sys.exit(0)
     else:
         pipeline_string = args.tasks
-        list_processes = None
 
     # used for lists print
-    proc_collector(process_map, args, list_processes)
+    proc_collector(process_map, args, pipeline_string)
 
     logger.info(colored_print("Resulting pipeline string:\n"))
     logger.info(colored_print(pipeline_string + "\n"))
