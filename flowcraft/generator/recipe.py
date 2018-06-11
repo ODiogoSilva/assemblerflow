@@ -478,8 +478,8 @@ class Recipe:
 
         return self.pipeline_string
 
-    def get_process_info(self):
-        return list(self.process_descriptions.keys())
+    # def get_process_info(self):
+    #     return list(self.process_descriptions.keys())
 
 
 class Innuendo(Recipe):

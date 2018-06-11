@@ -27,7 +27,6 @@ A NextFlow pipeline assembler for genomics.
    user/pipeline_building
    user/pipeline_configuration
    user/available_components
-   user/available_recipes
    user/pipeline_inspect
 
 .. _Developer Guide:
