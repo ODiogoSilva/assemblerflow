@@ -221,8 +221,7 @@ def build(args):
     # appropriate recipe
     if args.recipe:
         if args.recipe == "innuendo":
-            pipeline_string = brew_recipe(args,
-                                                          available_recipes)
+            pipeline_string = brew_recipe(args, available_recipes)
         else:
             pipeline_string = available_recipes[args.recipe]
             if args.tasks:
