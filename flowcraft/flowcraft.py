@@ -135,6 +135,9 @@ def get_args(args=None):
 
 def validate_build_arguments(args):
 
+    if args.detailed_list or args.short_list:
+        return
+
     if not args.tasks and not args.recipe and not args.check_only \
             and not args.detailed_list and not args.short_list:
         logger.error(colored_print(
