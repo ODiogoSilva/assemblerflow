@@ -559,3 +559,15 @@ def brew_recipe(args, available_recipes):
     pipeline_string = automatic_pipeline.run_auto_pipeline(input_processes)
 
     return pipeline_string
+
+
+# A dictionary of quick recipes
+available_recipes = {
+    "innuendo": Innuendo,
+    "plasmids": "integrity_coverage fastqc_trimmomatic (spades pilon "
+              "(mash_dist | abricate) | mash_screen | mapping_patlas)",
+    "plasmids_mapping": "integrity_coverage fastqc_trimmomatic mapping_patlas",
+    "plasmids_assembly": "integrity_coverage fastqc_trimmomatic (spades pilon"
+                         " mash_dist)",
+    "plasmids_mash": "integrity_coverage fastqc_trimmomatic mash_screen",
+}
