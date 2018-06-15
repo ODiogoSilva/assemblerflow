@@ -44,7 +44,7 @@ process process_abricate_{{ pid }} {
     file abricate_file from abricate_out_{{ pid }}.collect()
 
     output:
-    {% with task_name="process_abricate" %}
+    {% with task_name="process_abricate", sample_id="process_abricate" %}
     {%- include "compiler_channels.txt" ignore missing -%}
     {% endwith %}
 
