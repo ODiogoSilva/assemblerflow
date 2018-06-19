@@ -123,10 +123,14 @@ def proc_collector(process_map, args, pipeline_string):
             # instantiates each Process class
             cls_inst = cls(template=name)
 
-            if name in pipeline_string:
-                d = {arg_key: vars(cls_inst)[arg_key] for arg_key in
-                     vars(cls_inst) if arg_key in arguments_list}
-                procs_dict[name] = d
+            # checks if recipe is provided
+            if pipeline_string:
+                if name not in pipeline_string:
+                    continue
+
+            d = {arg_key: vars(cls_inst)[arg_key] for arg_key in
+                 vars(cls_inst) if arg_key in arguments_list}
+            procs_dict[name] = d
 
         procs_dict_parser(procs_dict)
 
