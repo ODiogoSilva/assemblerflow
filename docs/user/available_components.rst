@@ -64,6 +64,10 @@ Post-assembly
   from Spades and performs filtering base on quality criteria of GC content
   k-mer coverage and read length.
 
+Binning
+-------
+
+- :doc:`components/maxbin2`: An automatic tool for binning metagenomic sequences
 
 Annotation
 ----------
@@ -98,6 +102,8 @@ Mapping
   procedure of FastQ files into a their assembly and performs filtering
   based on quality criteria of read coverage and genome size.
 
+- :doc:`components/bowtie`: Align short paired-end sequencing reads to long reference sequences
+
 - :doc:`components/mapping_patlas`: Performs read mapping and generates a JSON
   input file for pATLAS.
 
@@ -108,7 +114,7 @@ Taxonomical Profiling
 ---------------------
 
 - :doc:`components/kraken`: Performs taxonomical identification with kraken
-  (minikrakenDB2014 as default database)
+  (minikrakenDB2017 as default database)
 
 - :doc:`components/midas_species`: Performs taxonomical identification on the
   species level with midas (requires database)
@@ -119,6 +125,9 @@ Typing
 - :doc:`components/chewbbaca`: Performs a core-genome/whole-genome Multilocus
   Sequence Typing analysis on an assembly using ChewBBACA.
 
+- :doc:`components/metamlst`: Checks the Sequence Type of metagenomic reads using
+  Multilocus Sequence Typing.
+
 - :doc:`components/mlst`: Checks the Sequence Type of an assembly using
   Multilocus Sequence Typing.
 
@@ -127,3 +136,6 @@ Typing
 
 - :doc:`components/seq_typing`: Determines the type of a given sample from a set
   of reference sequences.
+
+- :doc:`components/sistr`: Serovar predictions from whole-genome sequence assemblies
+  by determination of antigen gene and cgMLST gene alleles.

@@ -1,16 +1,22 @@
 # FlowCraft :whale2::package:
-(Previously Assemblerflow)
 
-![Nextflow version](https://img.shields.io/badge/nextflow->0.26.0-brightgreen.svg)
+![Nextflow version](https://img.shields.io/badge/nextflow->0.27.0-brightgreen.svg)
 ![Python version](https://img.shields.io/badge/python-3.6-brightgreen.svg)
 [![Build Status](https://travis-ci.org/assemblerflow/flowcraft.svg?branch=master)](https://travis-ci.org/assemblerflow/flowcraft)
 [![codecov](https://codecov.io/gh/assemblerflow/flowcraft/branch/master/graph/badge.svg)](https://codecov.io/gh/assemblerflow/flowcraft)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/f518854f780b41a08ca2fb1c14e360f0)](https://www.codacy.com/app/o.diogosilva/assemblerflow?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ODiogoSilva/assemblerflow&amp;utm_campaign=Badge_Grade)
 [![Documentation Status](https://readthedocs.org/projects/flowcraft/badge/?version=latest)](http://flowcraft.readthedocs.io/en/latest/?badge=latest)
-[![PyPI](https://img.shields.io/pypi/v/assemblerflow.svg)](https://pypi.python.org/pypi/assemblerflow/1.0.0rc3)
+[![PyPI version](https://badge.fury.io/py/flowcraft.svg)](https://badge.fury.io/py/flowcraft)
+[![Anaconda-Server Badge](https://anaconda.org/bioconda/flowcraft/badges/version.svg)](https://anaconda.org/bioconda/flowcraft)
+
+<p align="center">
+  <img width="360" src="docs/resources/logo_large.png" alt="nextflow_logo"/>
+</p>
 
 A [Nextflow](https://www.nextflow.io/) pipeline assembler for genomics.
 Pick your modules. Assemble them. Run the pipeline.
+
+(Previously known as Assemblerflow)
 
 ## The premisse
 
@@ -31,13 +37,13 @@ containers without having to install any of the pipeline dependencies?
 ```
 nextflow run my_pipeline.nf --fastq path/to/fastq
 
-N E X T F L O W  ~  version 0.28.0
-Launching `my_pipeline` [prickly_mcnulty] - revision: 041b7b793f
+N E X T F L O W  ~  version 0.30.1
+Launching `my_pipeline.nf` [admiring_lamarck] - revision: 82cc9cd2ed
 
 ============================================================
                 M Y   P I P E L I N E
 ============================================================
-Built using flowcraft v1.0.2
+Built using flowcraft v1.2.0
 
  Input FastQ                 : 2
  Input samples               : 1
@@ -45,15 +51,15 @@ Built using flowcraft v1.0.2
  Results are found in        : ./results
  Profile                     : standard
 
-Starting pipeline at Sun Apr 08 18:22:24 WEST 2018
+Starting pipeline at Tue Jun 12 19:38:26 WEST 2018
 
 [warm up] executor > local
 [7c/eb5f2f] Submitted process > integrity_coverage_1_1 (02AR0553)
 (...)
 [31/7d90a1] Submitted process > compile_pilon_report_1_6
 
-Completed at: Sun Apr 08 18:43:41 WEST 2018
-Duration    : 21m 17s
+Completed at: Tue Jun 12 19:58:32 WEST 2018
+Duration    : 20m 6s
 Success     : true
 Exit status : 0
 ```
@@ -84,14 +90,14 @@ conda install singularity
 
 ## How to use it
 
-The complete user guide of FlowCraft can be found on [readthedocs.org](http://assemblerflow.readthedocs.io/en/latest/?badge=latest).
+The complete user guide of FlowCraft can be found on [readthedocs.org](http://flowcraft.readthedocs.io/en/latest/?badge=latest).
 For a quick and dirty demonstration, see below.
 
 ### Quick guide
 
 #### Building a pipeline
 
-FlowCraft comes with a number of [ready-to-use components](http://assemblerflow.readthedocs.io/en/latest/user/available_components.html) to build your
+FlowCraft comes with a number of [ready-to-use components](http://flowcraft.readthedocs.io/en/latest/user/available_components.html) to build your
 own pipeline. Following some basic rules, such as the output type of one process
 must match the input type of the next process, assembling a pipeline is done
 using the `build` mode and the `-t` option:
@@ -116,13 +122,13 @@ of your particular pipeline using the `help` option:
 ```
 nextflow my_pipeline.nf --help
 
-N E X T F L O W  ~  version 0.28.0
-Launching `my_pipeline.nf` [prickly_keller] - revision: 1b3fec5658
+N E X T F L O W  ~  version 0.30.1
+Launching `my_pipeline.nf` [admiring_lamarck] - revision: 82cc9cd2ed
 
 ============================================================
                 A S S E M B L Y   P I P E
 ============================================================
-Built using flowcraft v1.0.2
+Built using flowcraft v1.2.0
 
 
 Usage:
@@ -171,6 +177,25 @@ nextflow run my_pipeline --fastq "path/to/fastq/*_{1,2}.*" -profile slurm_sing
 
 During the execution of the pipeline, the results and reports for each component
 are continuously saved to the `results` and `reports` directory, respectively.
+
+#### Inspecting a pipeline progress
+
+Since version 1.2.0, it is possible to inspect the progress of a nextflow pipeline
+using the `flowcraft inspect` mode. To check the progress in a terminal, simply
+type:
+
+```
+flowcraft inspect
+```
+
+On the directory where the pipeline is running. Alternatively, you can view the progress
+in FlowCraft's web service by using the ``broadcast`` option:
+
+```
+flowcraft inspect -m broadcast
+```
+
+<img src="https://github.com/assemblerflow/flowcraft-webapp/raw/master/flowcraft-webapp/frontend/resources/fc_short_demo.gif"/>
 
 ## Why not just write a Nextflow pipeline?
 
@@ -222,13 +247,17 @@ trimmomatic fastqc
 
 As the number of existing components grow, so does your freedom to build pipelines.
 
+## Roadmap
+
+You can see what we're planning next on our [roadmap guide](https://github.com/assemblerflow/flowcraft/wiki/Roadmap).
+
 ## Developer guide
 
 ### Adding new components
 
 Is there a missing component that you would like to see included? We would love
 to expand! You could make a component request in our
-[issue tracker](https://github.com/ODiogoSilva/flowcraft/issues).
+[issue tracker](https://github.com/assemblerflow/flowcraft/issues).
 
 If you want to be part of the team, you can contribute with the code as well. Each component
 in FlowCraft can be independently added without having to worry about

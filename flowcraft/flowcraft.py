@@ -88,6 +88,9 @@ def get_args(args=None):
     parser.add_argument(
         "--debug", dest="debug", action="store_const", const=True,
         help="Set log to debug mode")
+    parser.add_argument(
+        "-v, --version", dest="version", action="store_const", const=True,
+        help="Show version and exit.")
 
     # INSPECT MODE
     inspect_parser = subparsers.add_parser("inspect",
@@ -107,7 +110,7 @@ def get_args(args=None):
         help="Specify the inspection run mode."
     )
     inspect_parser.add_argument(
-        "-u", "--url", dest="url", default="http://localhost:8000/",
+        "-u", "--url", dest="url", default="http://192.92.149.169:80/",
         help="Specify the URL to where the data should be broadcast"
     )
     inspect_parser.add_argument(
@@ -143,7 +146,7 @@ def validate_build_arguments(args):
 
     if args.output_nf:
         parsed_output_nf = (args.output_nf if args.output_nf.endswith(".nf")
-                            else "{}.nf".format(args.output_nf))
+                            else "{}.nf".format(args.output_nf.strip()))
         opath = parsed_output_nf
         if os.path.dirname(opath):
             parent_dir = os.path.dirname(opath)
@@ -281,6 +284,9 @@ def inspect(args):
 def main():
 
     args = get_args()
+
+    if args.version:
+        print(__version__)
 
     if args.debug:
         logger.setLevel(logging.DEBUG)

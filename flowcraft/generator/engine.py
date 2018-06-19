@@ -16,6 +16,7 @@ try:
     import generator.components.annotation as annotation
     import generator.components.assembly_processing as ap
     import generator.components.downloads as downloads
+    import generator.components.mapping as map
     import generator.components.distance_estimation as distest
     import generator.components.metagenomics as meta
     import generator.components.patlas_mapping as mapping_patlas
@@ -27,12 +28,14 @@ try:
     from generator import header_skeleton as hs
     from generator import footer_skeleton as fs
     from generator.process_details import colored_print
+    from generator.pipeline_parser import guess_process
 except ImportError:
     import flowcraft.generator.process as pc
     import flowcraft.generator.components.assembly as assembly
     import flowcraft.generator.components.annotation as annotation
     import flowcraft.generator.components.assembly_processing as ap
     import flowcraft.generator.components.downloads as downloads
+    import flowcraft.generator.components.mapping as map
     import flowcraft.generator.components.distance_estimation as distest
     import flowcraft.generator.components.mlst as mlst
     import flowcraft.generator.components.metagenomics as meta
@@ -44,11 +47,13 @@ except ImportError:
     from flowcraft.generator import header_skeleton as hs
     from flowcraft.generator import footer_skeleton as fs
     from flowcraft.generator.process_details import colored_print
+    from flowcraft.generator.pipeline_parser import guess_process
 
 
 process_map = {
         "abricate": annotation.Abricate,
         "assembly_mapping": ap.AssemblyMapping,
+        "bowtie": map.Bowtie,
         "card_rgi": annotation.CardRgi,
         "check_coverage": readsqc.CheckCoverage,
         "chewbbaca": mlst.Chewbbaca,
@@ -60,7 +65,9 @@ process_map = {
         "mapping_patlas": mapping_patlas.PatlasMapping,
         "mash_dist": distest.PatlasMashDist,
         "mash_screen": distest.PatlasMashScreen,
+        "maxbin2": meta.MaxBin2,
         "megahit": meta.Megahit,
+        "metamlst": mlst.MetaMlst,
         "metaprob": meta.MetaProb,
         "metaspades": meta.Metaspades,
         "midas_species": meta.Midas_species,
@@ -312,8 +319,9 @@ class NextflowGenerator:
             # Check if process is available or correctly named
             if p_out_name not in process_map:
                 logger.error(colored_print(
-                    "\nThe process '{}' is not available".format(p_out_name),
-                    "red_bold"))
+                    "\nThe process '{}' is not available."
+                        .format(p_out_name), "red_bold"))
+                guess_process(p_out_name, process_map)
                 sys.exit(1)
 
             # Instance output process

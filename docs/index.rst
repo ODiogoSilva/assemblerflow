@@ -6,6 +6,10 @@
 FlowCraft
 =========
 
+.. image:: resources/logo_large.png
+   :scale: 20 %
+   :align: center
+
 A NextFlow pipeline assembler for genomics.
 
 .. _Getting Started:
@@ -16,6 +20,7 @@ A NextFlow pipeline assembler for genomics.
 
    getting_started/overview
    getting_started/installation
+   about/about
 
 .. _User Guide:
 
@@ -26,8 +31,8 @@ A NextFlow pipeline assembler for genomics.
    user/basic_usage
    user/pipeline_building
    user/pipeline_configuration
-   user/available_components
    user/pipeline_inspect
+   user/available_components
 
 .. _Developer Guide:
 
@@ -48,4 +53,3 @@ A NextFlow pipeline assembler for genomics.
    :caption: Source API
 
    flowcraft
-
