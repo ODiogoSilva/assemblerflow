@@ -28,10 +28,10 @@ process phenix_{{ pid }} {
     --variant $params.variant
 
     phenix.py run_snp_pipeline \
-    -r1 $fastq_pair[0] \
-    -r2 $fastq_pair[1] \
+    -r1 ${fastq_pair[0]} \
+    -r2 ${fastq_pair[1]} \
     -r ${reference} \
-    -c $config \
+    -c ${config} \
     --keep-temp \
     --json \
     --sample-name ${sample_id} \

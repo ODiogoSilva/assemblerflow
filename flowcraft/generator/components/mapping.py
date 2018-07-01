@@ -90,14 +90,14 @@ class Phenix(Process):
             "memory": "{ 5.GB * task.attempt }",
             "container": "quay.io/thanhleviet/phenix",
             "version": "latest",
-            "scratch": "true"
+            # "scratch": "true"
         },
         "extract_snps": {
             "cpus": 4,
             "memory": "{ 5.GB * task.attempt }",
             "container": "quay.io/biocontainers/snp-sites",
             "version": "2.4.0--ha92aebf_3",
-            "scratch": "true"
+            # "scratch": "true"
         }
         }
 
