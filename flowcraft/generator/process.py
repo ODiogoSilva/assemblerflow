@@ -44,7 +44,7 @@ class Process:
             "params": "fastq",
             "description": "Path expression to paired-end fastq files."
                            " (default: $params.fastq)",
-            "default_value": "'fastq/*_{1,2}.*'",
+            "default_value": "'fastq/*L001_R{1,2}_001.*'",
             "channel": "IN_fastq_raw",
             "channel_str":
                 "Channel.fromFilePairs(params.{0})"
@@ -69,6 +69,53 @@ class Process:
                 ".tokenize('.')[0..-2].join('.'), it] : null }}"
                 ".ifEmpty {{ exit 1, \"No fasta files provided with pattern:"
                 "'${{params.{0}}}'\" }}",
+            "checks":
+                "if (params.{0} instanceof Boolean){{"
+                "exit 1, \"'{0}' must be a path pattern. Provide value:"
+                "'$params.{0}'\"}}\n"
+                "if (!params.{0}){{ exit 1, \"'{0}' parameter "
+                "missing\"}}"
+
+        },
+        "csv_f1": {
+            "params": "csv_f1",
+            "description": "Path csv file with every 2 lines for a sample. (CSV fields: sample_id, /path/to/fastq)",
+            "default_value": "'reads.csv'",
+            "channel": "IN_csv_f1",
+            "channel_str":
+                "Channel.fromPath(file(params.{0}))."
+                "splitCsv(header:true, sep: '\t')"
+                "map{{ row -> "
+                "def original_path = row['original_path']"
+                "def sample_id = row['sample_id']"
+                "return [sample_id, file(original_path)] }}"
+                ".groupTuple()"
+                ".map{{ tuple_it -> "
+                "def sample_id = tuple_it[0]"
+                "def forward = tuple_it[1][0]"
+                "def reverse = tuple_it[1][1]"
+                "return [sample_id, file(forward), file(reverse)] }}",
+            "checks":
+                "if (params.{0} instanceof Boolean){{"
+                "exit 1, \"'{0}' must be a path pattern. Provide value:"
+                "'$params.{0}'\"}}\n"
+                "if (!params.{0}){{ exit 1, \"'{0}' parameter "
+                "missing\"}}"
+
+        },
+        "csv_f2": {
+            "params": "csv_list",
+            "description": "Path csv file. (CSV fields: sample_id, /path/to/forward-fastq, /path/to/reverse-fastq)",
+            "default_value": "'reads.csv'",
+            "channel": "IN_csv_f2",
+            "channel_str":
+                "Channel.fromPath(file(params.{0}))."
+                "splitCsv(header:true, sep: ',')"
+                "map{{ row -> "
+                "def sample_id = row['sample_id']"
+                "def forward = row['forward']"
+                "def reverse = row['reverse']"
+                "return [sample_id, file(forward), file(reverse)] }}",
             "checks":
                 "if (params.{0} instanceof Boolean){{"
                 "exit 1, \"'{0}' must be a path pattern. Provide value:"

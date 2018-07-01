@@ -23,6 +23,7 @@ try:
     import generator.components.reads_quality_control as readsqc
     import generator.components.typing as typing
     import generator.error_handling as eh
+    import flowcraft.generator.components.mapping as mapping
     from __init__ import __version__
     from generator import header_skeleton as hs
     from generator import footer_skeleton as fs
@@ -40,6 +41,7 @@ except ImportError:
     import flowcraft.generator.components.reads_quality_control as readsqc
     import flowcraft.generator.components.typing as typing
     import flowcraft.generator.error_handling as eh
+    import flowcraft.generator.components.mapping as mapping
     from flowcraft import __version__
     from flowcraft.generator import header_skeleton as hs
     from flowcraft.generator import footer_skeleton as fs
@@ -78,7 +80,8 @@ process_map = {
         "skesa": assembly.Skesa,
         "spades": assembly.Spades,
         "trimmomatic": readsqc.Trimmomatic,
-        "true_coverage": readsqc.TrueCoverage
+        "true_coverage": readsqc.TrueCoverage,
+        "phenix": mapping.Phenix
 }
 
 """
