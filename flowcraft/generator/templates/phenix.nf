@@ -49,7 +49,7 @@ process phenix_{{ pid }} {
     # Statistics for mapped bam file
     qualimap bamqc -bam ${sample_id}/${sample_id}.bam -outdir stats
 
-    mv stats/genome_results.txt ${sample_id}/${sample_id}_stats_cov.txt }
+    mv stats/genome_results.txt ${sample_id}/${sample_id}_stats_cov.txt
 
     echo pass > .status
     }
