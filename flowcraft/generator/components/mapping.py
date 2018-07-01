@@ -34,31 +34,31 @@ class Phenix(Process):
             "phenix_config": {
                 "default": "null",
                 "description":
-                    "Path to a config file in YAML format for SNP calling with Phenix."
+                    "Path to a config file in YAML format for SNP calling with Phenix. "
                     "Default: $params.phenix_config"
             },
             "reference": {
                 "default": "null",
                 "description":
-                    "Path to a reference genome."
+                    "Path to a reference genome. "
                     "Default: $params.reference"
             },
             "mapper": {
                 "default": "'bwa'",
                 "description":
-                    "Mapper [BWA | Bowtie2]."
-                    "Default: $params.reference"
+                    "Mapper [BWA | Bowtie2]. "
+                    "Default: $params.mapper"
             },
             "variant": {
                 "default": "'gatk'",
                 "description":
-                    "Mapper [gatk | mpileup]."
-                    "Default: $params.reference"
+                    "Mapper [gatk | mpileup]. "
+                    "Default: $params.variant"
             },
             "extract_snps": {
                 "default": "false",
                 "description":
-                    "Extract snps."
+                    "Extract snps. "
                     "Default: $params.extract_snps"
             }
             # "gatk_jar": {
@@ -117,19 +117,19 @@ class Snippy(Process):
             "threads": {
                 "default": "8",
                 "description":
-                    "Number of threads"
+                    "Number of threads. "
                     "Default: $params.threads"
             },
             "reference": {
                 "default": "null",
                 "description":
-                    "Path to a reference genome."
+                    "Path to a reference genome. "
                     "Default: $params.reference"
             },
             "core_genome": {
                 "default": "false",
                 "description":
-                    "Extract core genome."
+                    "Extract core genome. "
                     "Default: $params.core_genome"
             }
     }
