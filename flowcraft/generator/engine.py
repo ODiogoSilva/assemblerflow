@@ -23,7 +23,7 @@ try:
     import generator.components.reads_quality_control as readsqc
     import generator.components.typing as typing
     import generator.error_handling as eh
-    import flowcraft.generator.components.mapping as mapping
+    import generator.components.mapping as mapping
     from __init__ import __version__
     from generator import header_skeleton as hs
     from generator import footer_skeleton as fs
@@ -81,7 +81,8 @@ process_map = {
         "spades": assembly.Spades,
         "trimmomatic": readsqc.Trimmomatic,
         "true_coverage": readsqc.TrueCoverage,
-        "phenix": mapping.Phenix
+        "phenix": mapping.Phenix,
+        "snippy": mapping.Snippy
 }
 
 """

@@ -84,17 +84,17 @@ class Process:
             "channel": "IN_csv_f1",
             "channel_str":
                 "Channel.fromPath(file(params.{0}))."
-                "splitCsv(header:true, sep: '\t')"
-                "map{{ row -> "
-                "def original_path = row['original_path']"
-                "def sample_id = row['sample_id']"
-                "return [sample_id, file(original_path)] }}"
-                ".groupTuple()"
-                ".map{{ tuple_it -> "
-                "def sample_id = tuple_it[0]"
-                "def forward = tuple_it[1][0]"
-                "def reverse = tuple_it[1][1]"
-                "return [sample_id, file(forward), file(reverse)] }}",
+                "splitCsv(header:true, sep: '\t')\n"
+                ".map{{ row -> \n"
+                "\tdef original_path = row['original_path']\n"
+                "\tdef sample_id = row['sample_id']\n"
+                "\treturn [sample_id, file(original_path)] }}\n"
+                "\t.groupTuple()\n"
+                "\t.map{{ tuple_it -> \n"
+                "\tdef sample_id = tuple_it[0]\n"
+                "\tdef forward = tuple_it[1][0]\n"
+                "\tdef reverse = tuple_it[1][1]\n"
+                "\treturn [sample_id, [file(forward), file(reverse)]] }}",
             "checks":
                 "if (params.{0} instanceof Boolean){{"
                 "exit 1, \"'{0}' must be a path pattern. Provide value:"
