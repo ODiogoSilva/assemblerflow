@@ -32,7 +32,7 @@ class Phenix(Process):
 
         self.params = {
             "phenix_config": {
-                "default": "null",
+                "default": "'templates/phenix.yaml'",
                 "description":
                     "Path to a config file in YAML format for SNP calling with Phenix. "
                     "Default: $params.phenix_config"
@@ -46,7 +46,7 @@ class Phenix(Process):
             "mapper": {
                 "default": "'bwa'",
                 "description":
-                    "Mapper [BWA | Bowtie2]. "
+                    "Mapper [bwa | bowtie2]. "
                     "Default: $params.mapper"
             },
             "variant": {
@@ -89,15 +89,13 @@ class Phenix(Process):
             "cpus": 4,
             "memory": "{ 5.GB * task.attempt }",
             "container": "quay.io/thanhleviet/phenix",
-            "version": "latest",
-            # "scratch": "true"
+            "version": "latest"
         },
         "extract_snps": {
             "cpus": 4,
-            "memory": "{ 5.GB * task.attempt }",
+            "memory": "{ 1.GB * task.attempt }",
             "container": "quay.io/biocontainers/snp-sites",
-            "version": "2.4.0--ha92aebf_3",
-            # "scratch": "true"
+            "version": "2.4.0--ha92aebf_3"
         }
         }
 
