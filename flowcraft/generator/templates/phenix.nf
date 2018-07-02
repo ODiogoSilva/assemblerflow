@@ -23,7 +23,7 @@ process phenix_{{ pid }} {
     """
     {
 
-    phenix.py prepare_reference -r $reference \
+    phenix.py prepare_reference -r ${params.reference} \
     --mapper $params.mapper \
     --variant $params.variant
 
