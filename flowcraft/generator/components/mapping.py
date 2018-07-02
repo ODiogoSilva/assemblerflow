@@ -32,7 +32,7 @@ class Phenix(Process):
 
         self.params = {
             "phenix_config": {
-                "default": "null",
+                "default": "'templates/phenix.yaml'",
                 "description":
                     "Path to a config file in YAML format for SNP calling with Phenix. "
                     "Default: $params.phenix_config"
@@ -46,7 +46,7 @@ class Phenix(Process):
             "mapper": {
                 "default": "'bwa'",
                 "description":
-                    "Mapper [BWA | Bowtie2]. "
+                    "Mapper [bwa | bowtie2]. "
                     "Default: $params.mapper"
             },
             "variant": {
@@ -74,30 +74,28 @@ class Phenix(Process):
             #         "Default: $params.picard_jar"
             # }
         }
-        self.secondary_inputs = [
-            {
-                "params": "phenix_config",
-                "channel": "IN_phenix_config = Channel.fromPath(params.phenix_config)"
-            },
-            {
-                "params": "reference",
-                "channel": "IN_reference = Channel.fromPath(params.reference)"
-            }
-        ]
+        # self.secondary_inputs = [
+        #     {
+        #         "params": "phenix_config",
+        #         "channel": "IN_phenix_config = Channel.fromPath(params.phenix_config)"
+        #     },
+            # {
+            #     "params": "reference",
+            #     "channel": "IN_reference = Channel.fromPath(params.reference)"
+            # }
+        # ]
         self.directives = {
         "phenix": {
             "cpus": 4,
             "memory": "{ 5.GB * task.attempt }",
             "container": "quay.io/thanhleviet/phenix",
-            "version": "latest",
-            # "scratch": "true"
+            "version": "latest"
         },
         "extract_snps": {
             "cpus": 4,
-            "memory": "{ 5.GB * task.attempt }",
+            "memory": "{ 1.GB * task.attempt }",
             "container": "quay.io/biocontainers/snp-sites",
-            "version": "2.4.0--ha92aebf_3",
-            # "scratch": "true"
+            "version": "2.4.0--ha92aebf_3"
         }
         }
 
@@ -133,12 +131,12 @@ class Snippy(Process):
                     "Default: $params.core_genome"
             }
     }
-        self.secondary_inputs = [
-            {
-                "params": "reference",
-                "channel": "IN_reference = Channel.fromPath(params.reference)"
-            }
-        ]
+        # self.secondary_inputs = [
+        #     {
+        #         "params": "reference",
+        #         "channel": "IN_reference = Channel.fromPath(params.reference)"
+        #     }
+        # ]
         self.directives = {
         "snippy": {
             "cpus": 4,

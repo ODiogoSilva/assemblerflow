@@ -1,0 +1,11 @@
+mapper: bwa
+mapper-options: -t 4
+variant: gatk
+variant-options: --sample_ploidy 2 --genotype_likelihoods_model BOTH --max_alternate_alleles 2 -rf BadCigar -out_mode EMIT_ALL_SITES -nt 1
+filters:
+  ad_ratio: 0.9
+  min_depth: 10
+  qual_score: 40
+  mq_score: 30
+annotators:
+  - coverage

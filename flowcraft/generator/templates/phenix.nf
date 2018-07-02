@@ -52,8 +52,7 @@ process phenix_{{ pid }} {
     mv stats/genome_results.txt ${sample_id}/${sample_id}_stats_cov.txt
 
     echo pass > .status
-    }
-    || {
+    } || {
         echo fail > .status
     }
     """
@@ -75,7 +74,7 @@ if (params.extract_snps) {
               
        """ 
        cat $phenix_out/*.fasta > phenix.aln
-       snp-sites snps.mla phenix.aln       
+       snp-sites -o snps.mla phenix.aln       
        """ 
     }
 }

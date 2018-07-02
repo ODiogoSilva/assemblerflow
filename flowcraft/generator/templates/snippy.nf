@@ -25,8 +25,8 @@ process snippy_{{ pid }} {
     --prefix ${dataset_id} \
     --outdir ${dataset_id} \
     --ref $ref \
-    --pe1 $fastq_pair[0] \
-    --pe2 $fastq_pair[1]
+    --pe1 ${fastq_pair[0]} \
+    --pe2 ${fastq_pair[1]}
     
     echo pass > .status
     } || {
