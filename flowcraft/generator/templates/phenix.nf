@@ -40,7 +40,7 @@ process phenix_{{ pid }} {
     phenix.py vcf2fasta \
     -i ${sample_id}/${sample_id}.filtered.vcf \
     -o ${sample_id}/${sample_id}_all.fasta \
-    --reference ${reference} \
+    --reference ${params.reference} \
     --regex filtered
 
     # Remove reference genome
