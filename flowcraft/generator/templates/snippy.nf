@@ -9,7 +9,7 @@ process snippy_{{ pid }} {
 
     input:
     set sample_id, file(fastq_pair) from {{ input_channel }}
-    file reference from IN_reference
+    file params.reference
 
     output:
     file "${sample_id}" into OUT_snippy
@@ -24,7 +24,7 @@ process snippy_{{ pid }} {
     snippy --cpus $params.threads \
     --prefix ${dataset_id} \
     --outdir ${dataset_id} \
-    --ref $ref \
+    --ref ${params.reference} \
     --pe1 ${fastq_pair[0]} \
     --pe2 ${fastq_pair[1]}
     

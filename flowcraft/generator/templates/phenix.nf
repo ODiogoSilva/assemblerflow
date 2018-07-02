@@ -9,8 +9,8 @@ process phenix_{{ pid }} {
 
     input:
     set sample_id, file(fastq_pair) from {{ input_channel }}
-    file config from IN_phenix_config
-    file reference from IN_reference
+    file params.phenix_config
+    file params.reference
 
     output:
     file "${sample_id}" into OUT_phenix
@@ -30,8 +30,8 @@ process phenix_{{ pid }} {
     phenix.py run_snp_pipeline \
     -r1 ${fastq_pair[0]} \
     -r2 ${fastq_pair[1]} \
-    -r ${reference} \
-    -c ${config} \
+    -r ${params.reference} \
+    -c ${params.phenix_config} \
     --keep-temp \
     --json \
     --sample-name ${sample_id} \
