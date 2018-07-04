@@ -36,12 +36,14 @@ logger = get_logger(__file__)
 
 if __file__.endswith(".command.sh"):
     MASH_TXT = '$mashtxt'
+    SAMPLE_ID = '$sample_id'
     logger.debug("Running {} with parameters:".format(
         os.path.basename(__file__)))
     logger.debug("MASH_TXT: {}".format(MASH_TXT))
+    logger.debug("SAMPLE_ID: {}".format(MASH_TXT))
 
 @MainWrapper
-def main(mash_output):
+def main(mash_output, sample_id):
     '''
     converts top results from mash screen txt output to json format
 
@@ -91,8 +93,10 @@ def main(mash_output):
             copy_number = int(float(v[1]) / median_cutoff)
             # assure that plasmid as at least twice the median coverage depth
             if float(v[1]) > median_cutoff:
-                filtered_dic["_".join(k.split("_")[0:3])] = [v[0],
-                                                             str(copy_number)]
+                filtered_dic["_".join(k.split("_")[0:3])] = [
+                    round(float(v[0]),2),
+                    copy_number
+                ]
         logger.info(
             "Exported dictionary has {} entries".format(len(filtered_dic)))
     else:
@@ -103,6 +107,7 @@ def main(mash_output):
     output_json.close()
 
     json_dic = {
+        "sample_id": sample_id
         "patlas_mashscreen": filtered_dic
         # TODO add information for report webapp
     }
