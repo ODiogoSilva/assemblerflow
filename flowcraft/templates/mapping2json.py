@@ -264,11 +264,9 @@ def main(depth_file, json_dict, cutoff, sample_id):
                      "empty.")
 
     # then dump do file
-    # output_json = open("{}_mapping.json".format(depth_file), "w")
     logger.info("Dumping to {}".format("{}_mapping.json".format(depth_file)))
     with open("{}_mapping.json".format(depth_file), "w") as output_json:
         output_json.write(json.dumps(percentage_bases_covered))
-    # output_json.close()
 
     json_dic = {
         "sample": sample_id,

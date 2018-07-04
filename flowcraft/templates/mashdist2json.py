@@ -36,13 +36,15 @@ logger = get_logger(__file__)
 if __file__.endswith(".command.sh"):
     MASH_TXT = '$mashtxt'
     HASH_CUTOFF = '$params.shared_hashes'
+    SAMPLE_ID = '$sample_id'
     logger.debug("Running {} with parameters:".format(
         os.path.basename(__file__)))
     logger.debug("MASH_TXT: {}".format(MASH_TXT))
     logger.debug("HASH_CUTOFF: {}".format(HASH_CUTOFF))
+    logger.debug("SAMPLE_ID: {}".format(SAMPLE_ID))
 
 
-def send_to_output(master_dict, mash_output):
+def send_to_output(master_dict, mash_output, sample_id):
     """Send dictionary to output json file
     This function sends master_dict dictionary to a json file if master_dict is
     populated with entries, otherwise it won't create the file
@@ -59,6 +61,8 @@ def send_to_output(master_dict, mash_output):
     mash_output: str
         the name/path of input file to main function, i.e., the name/path of
         the mash dist output txt file.
+    sample_id: str
+        The name of the sample being parse to .report.json file
 
     Returns
     -------
@@ -72,8 +76,8 @@ def send_to_output(master_dict, mash_output):
         out_file.close()
 
         json_dic = {
+            "sample": sample_id,
             "patlas_mashdist": master_dict
-            # TODO add information for report webapp
         }
 
         with open(".report.json", "w") as json_report:
@@ -81,7 +85,7 @@ def send_to_output(master_dict, mash_output):
 
 
 @MainWrapper
-def main(mash_output, hash_cutoff):
+def main(mash_output, hash_cutoff, sample_id):
     '''
     Main function that allows to dump a mash dist txt file to a json file
 
@@ -89,7 +93,12 @@ def main(mash_output, hash_cutoff):
     ----------
     mash_output: str
         A string with the input file.
-
+    hash_cutoff: str
+        the percentage cutoff for the percentage of shared hashes between query
+        and plasmid in database that is allowed for the plasmid to be reported
+        to the results outputs
+    sample_id: str
+        The name of the sample.
     '''
     input_f = open(mash_output, "r")
 
@@ -116,13 +125,15 @@ def main(mash_output, hash_cutoff):
         # reported to json file
         if perc_hashes > float(hash_cutoff):
 
-            master_dict[ref_accession] = [1 - float(mash_dist), perc_hashes,
-                                              current_seq]
+            master_dict[ref_accession] = [
+                round(1 - float(mash_dist), 2),
+                round(perc_hashes, 2),
+                current_seq
+            ]
 
     # assures that file is closed in last iteration of the loop
-    send_to_output(master_dict, mash_output)
-
+    send_to_output(master_dict, mash_output, sample_id)
 
 if __name__ == "__main__":
 
-    main(MASH_TXT, HASH_CUTOFF)
+    main(MASH_TXT, HASH_CUTOFF, SAMPLE_ID)

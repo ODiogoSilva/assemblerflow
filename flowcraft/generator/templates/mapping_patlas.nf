@@ -51,7 +51,7 @@ process jsonDumpingMapping_{{ pid }} {
 
     tag { sample_id }
 
-    publishDir 'results/mapping/mapping_json_{{ pid }}/', mode: 'copyNoFollow'
+    publishDir 'results/mapping/mapping_json_{{ pid }}/', mode: 'copy'
 
     input:
     set sample_id, file(depthFile) from samtoolsResults
