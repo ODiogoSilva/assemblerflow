@@ -52,6 +52,8 @@ def main(mash_output, sample_id):
     mash_output: str
         this is a string that stores the path to this file, i.e, the name of
         the file
+    sample_id: str
+        sample name
 
     '''
     logger.info("Reading file : {}".format(mash_output))
@@ -107,7 +109,7 @@ def main(mash_output, sample_id):
     output_json.close()
 
     json_dic = {
-        "sample_id": sample_id
+        "sample_id": sample_id,
         "patlas_mashscreen": filtered_dic
         # TODO add information for report webapp
     }
@@ -117,4 +119,4 @@ def main(mash_output, sample_id):
 
 if __name__ == "__main__":
 
-    main(MASH_TXT)
+    main(MASH_TXT, SAMPLE_ID)
