@@ -22,8 +22,8 @@ Code documentation
 
 """
 
-__version__ = "1.2.0"
-__build__ = "17052018"
+__version__ = "1.3.0"
+__build__ = "04072018"
 __template__ = "mashsdist2json-nf"
 
 import os

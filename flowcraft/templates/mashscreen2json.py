@@ -22,8 +22,8 @@ Code documentation
 
 """
 
-__version__ = "1.0.1"
-__build__ = "20022018"
+__version__ = "1.1.0"
+__build__ = "04072018"
 __template__ = "mashscreen2json-nf"
 
 from statistics import median
