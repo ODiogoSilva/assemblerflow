@@ -26,9 +26,9 @@ process fasterqDump_{{ pid }} {
         echo "Downloading the following accession: ${accession_id}"
         echo ${params.option_file{{ param_id }}}
         fasterq-dump ${accession_id} -e ${task.cpus} -p ${optionFile}
-        test -f ${accession_id}_1.fastq && gzip ${accession_id}_1.fastq \
+        test -f ${accession_id}_1.fastq && pigz ${accession_id}_1.fastq \
         ${accession_id}_2.fastq || test -f ${accession_id}_3.fastq && \
-        gzip ${accession_id}_3.fastq || echo "No reads were found to compress"
+        pigz ${accession_id}_3.fastq || echo "No reads were found to compress"
     } || {
         # If exit code other than 0
         if [ \$? -eq 0 ]
