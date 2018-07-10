@@ -25,8 +25,11 @@ Input/Output type
 Parameters
 ----------
 
-- ``option_file``: This options enables the `option-file` parameter to
+- ``option_file``: This options enables the *option-file* parameter to
 ``fasterq-dump``, enabling to pass additional parameters to it.
+- ``compress_fastq``: This options allows users to disable the compression of
+the fastq files resulting from this component. The default ('yes') behavior
+compresses the fastq files to *fastq.gz*.
 
 Published results
 -----------------
