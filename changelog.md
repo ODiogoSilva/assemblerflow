@@ -8,6 +8,12 @@
 with failed processes but with the work directory removed (the log files
 where no longer available).
 
+### Components changes
+
+- `mapping_patlas`: refactored to remove temporary files used to create
+sam and bam files and added data to .report.json
+- `mash_screen` and `mash_dist`: addded data to .report.json
+
 ## 1.2.1
 
 ### Improvements
@@ -38,11 +44,6 @@ plasmids). This also includes annotation with abricate for the assembly.
 - `plasmids_mash`: A recipe to perform mash screen for plasmids.
 - `plasmids_assembly`: A recipe to perform mash dist for plasmid
 assemblies.
-
-### Components changes
-
-- `mapping_patlas`: refactored to remove temporary files used to create
-sam and bam files and added data to .report.json
 
 ### Minor/Other changes
 
