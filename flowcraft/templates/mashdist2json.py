@@ -35,7 +35,7 @@ logger = get_logger(__file__)
 
 if __file__.endswith(".command.sh"):
     MASH_TXT = '$mashtxt'
-    HASH_CUTOFF = '$params.shared_hashes'
+    HASH_CUTOFF = '$shared_hashes'
     SAMPLE_ID = '$sample_id'
     logger.debug("Running {} with parameters:".format(
         os.path.basename(__file__)))
@@ -100,6 +100,7 @@ def main(mash_output, hash_cutoff, sample_id):
     sample_id: str
         The name of the sample.
     '''
+
     input_f = open(mash_output, "r")
 
     master_dict = {}

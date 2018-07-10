@@ -3,7 +3,13 @@ if (Float.parseFloat(params.cov_cutoff.toString()) == 0) {
     exit 1, "Cutoff value of 0 will output every plasmid in the database with coverage 0. Provide a value higher than 0."
 }
 
-// process that runs bowtie2
+IN_index_files_{{ pid }} = Channel.value(params.refIndex{{ param_id }})
+IN_samtools_indexes_{{ pid }} = Channel.value(params.samtoolsIndex{{ param_id }})
+IN_length_json_{{ pid }} = Channel.value(params.lengthJson{{ param_id }})
+IN_cov_cutoff_{{ pid }} = Channel.value(params.cov_cutoff{{ param_id }})
+
+
+// process that runs bowtie2 and samtools
 process mappingBowtie_{{ pid }} {
 
     {% include "post.txt" ignore missing %}
@@ -12,8 +18,8 @@ process mappingBowtie_{{ pid }} {
 
     input:
     set sample_id, file(reads) from {{ input_channel }}
-    val bowtie2Index from IN_index_files
-    val samtoolsIdx from IN_samtools_indexes
+    val bowtie2Index from IN_index_files_{{ pid }}
+    val samtoolsIdx from IN_samtools_indexes_{{ pid }}
 
     output:
     set sample_id, file("samtoolsDepthOutput*.txt") into samtoolsResults
@@ -31,7 +37,7 @@ process mappingBowtie_{{ pid }} {
     //}
 
     """
-    bowtie2 -x ${bowtie2Index} ${readsString} -p ${task.cpus} -a -5 ${params.trim5} | \
+    bowtie2 -x ${bowtie2Index} ${readsString} -p ${task.cpus} -a -5 ${params.trim5{{ param_id }}} | \
     samtools view -b -t ${samtoolsIdx} -@ ${task.cpus} - | \
     samtools sort -@ ${task.cpus} -o samtoolsSorted_${sample_id}.bam
     samtools index samtoolsSorted_${sample_id}.bam
@@ -55,7 +61,8 @@ process jsonDumpingMapping_{{ pid }} {
 
     input:
     set sample_id, file(depthFile) from samtoolsResults
-    val lengthJson from IN_length_json
+    val lengthJson from IN_length_json_{{ pid }}
+    val cov_cutoff from IN_cov_cutoff_{{ pid }}
 
     output:
     set sample_id, file("samtoolsDepthOutput*.txt_mapping.json") optional true into mappingOutputChannel_{{ pid }}

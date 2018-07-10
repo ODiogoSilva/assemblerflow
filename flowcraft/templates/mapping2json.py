@@ -44,7 +44,7 @@ logger = get_logger(__file__)
 if __file__.endswith(".command.sh"):
     DEPTH_TXT = '$depthFile'
     JSON_LENGTH = '$lengthJson'
-    CUTOFF = '$params.cov_cutoff'
+    CUTOFF = '$cov_cutoff'
     SAMPLE_ID = '$sample_id'
 else:
     DEPTH_TXT = sys.argv[1]
@@ -81,13 +81,6 @@ def depth_file_reader(depth_file):
     ----------
     depth_file: textIO
         the path to depth file for each sample
-    plasmid_length: dict
-        a dictionary that stores length of all plasmids in fasta given as input
-    cutoff: float
-        the cutoff used to trim the unwanted matches for the minimum coverage
-        results from mapping. This is then converted into a float within this
-        function in order to compare with the value returned from the
-        perc_value_per_ref.
 
     Returns
     -------
