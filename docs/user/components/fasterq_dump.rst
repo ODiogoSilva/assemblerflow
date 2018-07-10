@@ -16,8 +16,8 @@ receive FastQ data.
 Input/Output type
 ------------------
 
-- Input type: ``Accessions``
-- Output type: ``FastQ``
+- Input type: ``accessions``
+- Output type: ``fastq``
 
 .. note::
     The default input parameter for Accessions data is ``--accessions``.
@@ -25,8 +25,8 @@ Input/Output type
 Parameters
 ----------
 
-- ``option_file``: This options enables the *option-file* parameter to
-``fasterq-dump``, enabling to pass additional parameters to it.
+- ``option_file``: This options enables the *option-file* parameter of
+``fasterq-dump``, allowing parameters to be passed.
 - ``compress_fastq``: This options allows users to disable the compression of
 the fastq files resulting from this component. The default ('yes') behavior
 compresses the fastq files to *fastq.gz*.
