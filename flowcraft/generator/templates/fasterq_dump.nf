@@ -8,7 +8,7 @@ process fasterqDump_{{ pid }} {
     {% include "post.txt" ignore missing %}
 
     tag { accession_id }
-    publishDir "reads/", pattern: "${accession_id}/*fastq.gz"
+    publishDir "reads/${accession_id}/", pattern: "*fastq.gz"
     maxRetries 1
 
     input:
