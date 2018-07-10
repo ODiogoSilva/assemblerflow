@@ -39,3 +39,40 @@ class DownloadReads(Process):
             "container": "flowcraft/getseqena",
             "version": "0.4.0-1"
         }}
+
+
+class FasterqDump(Process):
+    """Process template for fasterq-dump
+
+    This process is set with:
+
+        - ``input_type``: accessions
+        - ``output_type`` fastq
+
+    """
+
+    def __init__(self, **kwargs):
+
+        super().__init__(**kwargs)
+
+        self.input_type = "accessions"
+        self.output_type = "fastq"
+
+        self.params = {
+            "option_file": {
+                "default": "false",
+                "description": "Read more options and parameters from the file."
+                           "Use to provide parameters to fasterq-dump"
+            }
+        }
+
+        self.directives = {"fasterqDump": {
+            "cpus": 1,
+            "memory": "'1GB'",
+            "container": "flowcraft/sra-tools",
+            "version": "2.9.1-1"
+        }}
+
+        self.status_channels = [
+            "fasterqDump"
+        ]

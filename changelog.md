@@ -8,6 +8,21 @@
 with failed processes but with the work directory removed (the log files
 where no longer available).
 
+### New components
+
+- Added new component called `fasterq_dump` that adds fasterq_dump from
+sra-tools.
+
+### Minor/Other changes
+
+- Added check for `params.accessions` that enables to report a proper
+error when it is set to `null`.
+
+### Bug fixes
+
+- Removed the need for the nf process templates to have an empty line
+at the beginning of the template files.
+
 ## 1.2.1
 
 ### Improvements
