@@ -25,7 +25,7 @@ process fasterqDump_{{ pid }} {
     {
         echo "Downloading the following accession: ${accession_id}"
         fasterq-dump ${accession_id} -e ${task.cpus} -p ${optionFile}
-        if [ ${params.compress_fastq{{ param_id }}} = "yes" ]
+        if [ ${params.compress_fastq{{ param_id }}} = "true" ]
         then
             echo "Compressing FastQ files..."
             if [ -f ${accession_id}_1.fastq ]

@@ -65,7 +65,7 @@ class FasterqDump(Process):
                            "Use to provide parameters to fasterq-dump"
             },
             "compress_fastq": {
-                "default": "'yes'",
+                "default": "'true'",
                 "description": "This option allow the users to define if they"
                                "want to compress the downloaded fastq files, "
                                "saving disk space. Default behavior is set"
