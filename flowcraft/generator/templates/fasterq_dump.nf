@@ -25,7 +25,7 @@ process fasterqDump_{{ pid }} {
     {
         echo "Downloading the following accession: ${accession_id}"
         fasterq-dump ${accession_id} -e ${task.cpus} -p ${optionFile}
-        if [ ${params.compress_fastq{{ param_id }}} = "true" ]
+        if [ ${params.compress_fastq{{ param_id }}} = true ]
         then
             echo "Compressing FastQ files..."
             if [ -f ${accession_id}_1.fastq ]
@@ -36,7 +36,7 @@ process fasterqDump_{{ pid }} {
                 echo "No paired end reads were found to compress."
                 pigz -p ${task.cpus} ${accession_id}_3.fastq
             else
-                echo "FastQ files weren't compressed. Check if any FastQ file was downloaded."
+                echo "FastQ files weren't compressed. Check if FastQ files were downloaded."
             fi
         else
             echo "FastQ files won't be compressed because compress_fastq options was set to: '${params.compress_fastq{{ param_id }}}.'"
