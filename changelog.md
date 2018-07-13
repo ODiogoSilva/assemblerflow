@@ -18,8 +18,8 @@ sam and bam files and added data to .report.json
 
 ### New components
 
-- Added new component called `fasterq_dump` that adds fasterq_dump from
-sra-tools.
+- Added new components called `fasterq_dump`, `mash_sketch_fasta` and
+`mash_sketch_fastq` that adds fasterq_dump from sra-tools.
 
 ### Minor/Other changes
 

@@ -134,7 +134,7 @@ class MashSketchFasta(Process):
 
         super().__init__(**kwargs)
 
-        self.input_type = "fasta" # TODO make the same for fastq
+        self.input_type = "fasta"
         self.output_type = "msh"
 
         self.ignore_type = True
