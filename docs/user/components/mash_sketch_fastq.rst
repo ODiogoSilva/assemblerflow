@@ -27,7 +27,7 @@ Parameters
   Default: 1000.
 
 - ``minKmer``: Minimum copies of each k-mer required to pass noise filter for
-  reads. Default: 1"
+  reads. Default: 1.
 
 - ``genomeSize``: Genome size (raw bases or with K/M/G/T). If specified, will
   be used for p-value calculation instead of an estimated size from k-mer
