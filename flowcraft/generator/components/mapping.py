@@ -26,7 +26,7 @@ class Phenix(Process):
         self.input_type = "fastq"
         self.output_type = "fasta"
 
-        self.link_end.append({"link": "SIDE_max_len", "alias": "SIDE_max_len"})
+        # self.link_end.append({"link": "SIDE_max_len", "alias": "SIDE_max_len"})
 
         # self.dependencies = ["integrity_coverage"]
 
@@ -74,26 +74,26 @@ class Phenix(Process):
             #         "Default: $params.picard_jar"
             # }
         }
-        # self.secondary_inputs = [
-        #     {
-        #         "params": "phenix_config",
-        #         "channel": "IN_phenix_config = Channel.fromPath(params.phenix_config)"
-        #     },
-            # {
-            #     "params": "reference",
-            #     "channel": "IN_reference = Channel.fromPath(params.reference)"
-            # }
-        # ]
+        self.secondary_inputs = [
+            {
+                "params": "phenix_config",
+                "channel": "IN_phenix_config = Channel.fromPath(params.phenix_config)"
+            },
+            {
+                "params": "reference",
+                "channel": "IN_reference_phenix = Channel.fromPath(params.reference)"
+            }
+        ]
         self.directives = {
         "phenix": {
-            "cpus": 4,
-            "memory": "{ 5.GB * task.attempt }",
+            "cpus": 1,
+            "memory": "{ 2.GB * task.attempt }",
             "container": "quay.io/thanhleviet/phenix",
             "version": "latest"
         },
         "extract_snps": {
-            "cpus": 4,
-            "memory": "{ 1.GB * task.attempt }",
+            "cpus": 1,
+            "memory": "{ 2.GB * task.attempt }",
             "container": "quay.io/biocontainers/snp-sites",
             "version": "2.4.0--ha92aebf_3"
         }
@@ -130,17 +130,23 @@ class Snippy(Process):
                     "Extract core genome. "
                     "Default: $params.core_genome"
             }
-    }
-        # self.secondary_inputs = [
-        #     {
-        #         "params": "reference",
-        #         "channel": "IN_reference = Channel.fromPath(params.reference)"
-        #     }
-        # ]
+        }
+        self.secondary_inputs = [
+            {
+                "params": "reference",
+                "channel": "IN_reference_snippy = Channel.fromPath(params.reference)"
+            }
+        ]
         self.directives = {
         "snippy": {
-            "cpus": 4,
-            "memory": "{ 5.GB * task.attempt }",
+            "cpus": 1,
+            "memory": "{ 2.GB * task.attempt }",
+            "container": "quay.io/biocontainers/snippy",
+            "version": "4.0_dev--1"
+            },
+        "snippy_core": {
+            "cpus": 1,
+            "memory": "{ 2.GB * task.attempt }",
             "container": "quay.io/biocontainers/snippy",
             "version": "4.0_dev--1"
             }

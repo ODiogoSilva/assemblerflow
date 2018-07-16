@@ -1,3 +1,5 @@
+reference_snippy_ch = IN_reference_snippy.first()
+
 process snippy_{{ pid }} {
 
     // Send POST request to platform
@@ -9,12 +11,12 @@ process snippy_{{ pid }} {
 
     input:
     set sample_id, file(fastq_pair) from {{ input_channel }}
-    file params.reference
+    each file(reference_snippy) from reference_snippy_ch
 
     output:
     file "${sample_id}" into OUT_snippy
 
-    {% with task_name="phenix" %}
+    {% with task_name="snippy" %}
     {%- include "compiler_channels.txt" ignore missing -%}
     {% endwith %}
 
@@ -22,9 +24,9 @@ process snippy_{{ pid }} {
     """
     {
     snippy --cpus $params.threads \
-    --prefix ${dataset_id} \
-    --outdir ${dataset_id} \
-    --ref ${params.reference} \
+    --prefix ${sample_id} \
+    --outdir ${sample_id} \
+    --ref ${reference_snippy} \
     --pe1 ${fastq_pair[0]} \
     --pe2 ${fastq_pair[1]}
     

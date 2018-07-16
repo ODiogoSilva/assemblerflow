@@ -1,3 +1,6 @@
+reference_phenix_ch = IN_reference_phenix.first()
+phenix_config_ch = IN_phenix_config.first()
+
 process phenix_{{ pid }} {
 
     // Send POST request to platform
@@ -9,8 +12,8 @@ process phenix_{{ pid }} {
 
     input:
     set sample_id, file(fastq_pair) from {{ input_channel }}
-    file params.phenix_config
-    file params.reference
+    each file(phenix_config) from phenix_config_ch
+    each file(reference_phenix) from reference_phenix_ch
 
     output:
     file "${sample_id}" into OUT_phenix
@@ -18,20 +21,20 @@ process phenix_{{ pid }} {
     {% with task_name="phenix" %}
     {%- include "compiler_channels.txt" ignore missing -%}
     {% endwith %}
-
+    
     script:
     """
     {
 
-    phenix.py prepare_reference -r ${params.reference} \
+    phenix.py prepare_reference -r ${reference_phenix} \
     --mapper $params.mapper \
     --variant $params.variant
 
     phenix.py run_snp_pipeline \
     -r1 ${fastq_pair[0]} \
     -r2 ${fastq_pair[1]} \
-    -r ${params.reference} \
-    -c ${params.phenix_config} \
+    -r ${reference_phenix} \
+    -c ${phenix_config} \
     --keep-temp \
     --json \
     --sample-name ${sample_id} \
@@ -40,11 +43,11 @@ process phenix_{{ pid }} {
     phenix.py vcf2fasta \
     -i ${sample_id}/${sample_id}.filtered.vcf \
     -o ${sample_id}/${sample_id}_all.fasta \
-    --reference ${params.reference} \
+    --reference ${reference_phenix} \
     --regex filtered
 
     # Remove reference genome
-    seqkit grep -n -i -v -p "reference" ${sample_id}/${sample_id}_all.fasta > ${sample_id}/${sample_id}.fasta
+    seqkit grep -n -i -v -p "reference" ${sample_id}/${sample_id}_all.fasta > ${sample_id}/${sample_id}.fa
 
     # Statistics for mapped bam file
     qualimap bamqc -bam ${sample_id}/${sample_id}.bam -outdir stats
@@ -72,10 +75,10 @@ if (params.extract_snps) {
        
        script:
               
-       """ 
-       cat $phenix_out/*.fasta > phenix.aln
+       """
+       cat */*.fa > phenix.aln
        snp-sites -o snps.mla phenix.aln       
-       """ 
+       """  
     }
 }
 
