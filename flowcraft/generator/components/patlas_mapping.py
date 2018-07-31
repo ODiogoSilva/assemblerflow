@@ -28,12 +28,12 @@ class PatlasMapping(Process):
                                "covered by reads (in absolute lenght)."
             },
             "refIndex": {
-                "default": "'/ngstools/data/indexes/patlas_bowtie_index'",
+                "default": "'/ngstools/data/indexes/patlas_bowtie2_index'",
                 "description": "Specifies the reference indexes to be provided"
                                " to bowtie2."
             },
             "samtoolsIndex": {
-                "default": "'/ngstools/data/indexes/master_fasta_v1_4_1_11_06_2018.fas.fai'",
+                "default": "'/ngstools/data/indexes/master_fasta_plasmid_db.fas.fai'",
                 "description": "Specifies the reference indexes to be provided"
                                " to samtools."
             },
@@ -47,14 +47,14 @@ class PatlasMapping(Process):
         self.directives = {
             "mappingBowtie": {
                 "container": "flowcraft/mapping-patlas",
-                "version": "1.4.1-1",
+                "version": "1.5.2-1",
                 "cpus": 1,
                 "memory": "{ 4.GB * task.attempt }",
                 "scratch": "true"
             },
             "jsonDumpingMapping": {
                 "container": "flowcraft/mapping-patlas",
-                "version": "1.4.1-1",
+                "version": "1.5.2-1",
                 "cpus": 1,
                 "memory": "'4GB'"
             }
