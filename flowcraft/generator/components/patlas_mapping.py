@@ -47,14 +47,14 @@ class PatlasMapping(Process):
         self.directives = {
             "mappingBowtie": {
                 "container": "flowcraft/mapping-patlas",
-                "version": "1.5.2-1",
+                "version": "1.5.2-2",
                 "cpus": 1,
                 "memory": "{ 4.GB * task.attempt }",
                 "scratch": "true"
             },
             "jsonDumpingMapping": {
                 "container": "flowcraft/mapping-patlas",
-                "version": "1.5.2-1",
+                "version": "1.5.2-2",
                 "cpus": 1,
                 "memory": "'4GB'"
             }
