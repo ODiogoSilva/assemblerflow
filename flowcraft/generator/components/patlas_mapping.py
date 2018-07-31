@@ -38,7 +38,7 @@ class PatlasMapping(Process):
                                " to samtools."
             },
             "lengthJson": {
-                "default": "'/ngstools/data/length_v1_4_1_11_06_2018.json'",
+                "default": "'/ngstools/data/length_plasmid_db.json'",
                 "description": "A dictionary of all the lengths of reference "
                                "sequences."
             }
