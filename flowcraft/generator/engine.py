@@ -134,11 +134,22 @@ class NextflowGenerator:
         int: Stores the number of lanes in the pipelines
         """
 
+        self.export_parameters = export_params
+        """
+        bool: Determines whether the build mode is only for the export of 
+        parameters in JSON format. Setting to True will disabled some checks,
+        such as component dependency requirements
+        """
+
+        # When the export_params option is used, disable the auto dependency
+        # feature automatically
+        auto_deps = auto_dependency if not self.export_parameters else False
+
         # Builds the connections in the processes, which parses the
         # process_connections dictionary into the self.processes attribute
         # list.
         self._build_connections(process_connections, ignore_dependencies,
-                                auto_dependency)
+                                auto_deps)
 
         self.nf_file = nextflow_file
         """
@@ -409,7 +420,7 @@ class NextflowGenerator:
                         if auto_dependency:
                             self._add_dependency(
                                 out_process, dep, in_lane, out_lane, p)
-                        else:
+                        elif not self.export_parameters:
                             logger.error(colored_print(
                                 "\nThe following dependency of the process"
                                 " '{}' is missing: {}".format(p_out_name, dep),

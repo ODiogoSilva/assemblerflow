@@ -287,7 +287,8 @@ def build(args):
                             nextflow_file=parsed_output_nf,
                             pipeline_name=args.pipeline_name,
                             auto_dependency=args.no_dep,
-                            merge_params=args.merge_params)
+                            merge_params=args.merge_params,
+                            export_params=args.export_params)
 
     logger.info(colored_print("Building your awesome pipeline..."))
 
