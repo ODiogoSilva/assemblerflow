@@ -16,7 +16,8 @@ process fastAniMatrix_{{ pid }} {
 
     """
     fastANI --ql ${fasta} --rl ${fasta} \
-    -o ${sample_id.take(sample_id.lastIndexOf("."))}.out
+    -o ${sample_id.take(sample_id.lastIndexOf("."))}.out &> \
+    ${sample_id.take(sample_id.lastIndexOf("."))}.err
     """
 
 }
