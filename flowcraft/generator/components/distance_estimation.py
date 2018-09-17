@@ -205,28 +205,11 @@ class MashSketchFastq(MashSketchFasta):
 class FastAniMatrix(Process):
 
     def __init__(self, **kwargs):
+
         super().__init__(**kwargs)
 
         self.input_type = "fasta"
         self.output_type = "out"
-
-        # add more params to dict
-        self.params.update({
-            "minKmer": {
-                "default": 1,
-                "description": "Minimum copies of each k-mer required to pass "
-                               "noise filter for reads. Implies -r. Default: 1"
-            },
-            "genomeSize": {
-                "default": "false",
-                "description": "Genome size (raw bases or with K/M/G/T). If "
-                               "specified, will be used for p-value calculation"
-                               " instead of an estimated size from k-mer "
-                               "content. Default: false, meaning that it won't"
-                               "be used. If you want to use it pass a number to"
-                               " this parameter."
-            }
-        })
 
         self.directives = {
             "fastAniMatrix": {
