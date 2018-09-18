@@ -1,3 +1,5 @@
+IN_fragLen_{{ pid }} = Channel.value(params.fragLen{{ param_id }})
+
 // runs fast ani for multiple comparisons (many to many mode)
 process fastAniMatrix_{{ pid }} {
 
@@ -7,6 +9,7 @@ process fastAniMatrix_{{ pid }} {
 
     input:
     set sample_id, file(fasta) from {{ input_channel }}
+    val fragLenValue from IN_fragLen_{{ pid }}
 
     output:
     set sample_id, fasta, file("*.out") into fastAniMatrixOutChannel_{{ pid }}
@@ -17,7 +20,7 @@ process fastAniMatrix_{{ pid }} {
     """
     mkdir fasta_store
     fastANI --ql files_fastani.txt --rl files_fastani.txt \
-    -t ${task.cpus} --fragLen ${fragLen} \
+    -t ${task.cpus} --fragLen ${fragLenValue} \
     -o ${sample_id.take(sample_id.lastIndexOf("."))}_fastani.out
     """
 
