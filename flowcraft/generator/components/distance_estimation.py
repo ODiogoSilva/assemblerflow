@@ -211,12 +211,19 @@ class FastAniMatrix(Process):
         self.input_type = "fasta"
         self.output_type = "out"
 
+        self.params = {
+            "fragLen": {
+                "default": 3000,
+                "description": "Set size of fragment. Default: 3000."
+            }
+        }
+
         self.directives = {
             "fastAniMatrix": {
                 "container": "flowcraft/fast_ani",
                 "version": "1.1.0-1",
-                "cpus": 1,
-                "memory": "{ 4.GB * task.attempt }"
+                "cpus": 20,
+                "memory": "{ 30.GB * task.attempt }"
             },
         }
 

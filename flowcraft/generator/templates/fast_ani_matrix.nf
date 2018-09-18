@@ -15,9 +15,10 @@ process fastAniMatrix_{{ pid }} {
     {% endwith %}
 
     """
-    fastANI --ql ${fasta} --rl ${fasta} \
-    -o ${sample_id.take(sample_id.lastIndexOf("."))}.out &> \
-    ${sample_id.take(sample_id.lastIndexOf("."))}.err
+    mkdir fasta_store
+    fastANI --ql files_fastani.txt --rl files_fastani.txt \
+    -t ${task.cpus} --fragLen ${fragLen} \
+    -o ${sample_id.take(sample_id.lastIndexOf("."))}_fastani.out
     """
 
 }
