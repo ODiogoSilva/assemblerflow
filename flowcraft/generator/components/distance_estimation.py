@@ -221,7 +221,7 @@ class FastAniMatrix(Process):
         self.directives = {
             "fastAniMatrix": {
                 "container": "flowcraft/fast_ani",
-                "version": "1.1.0-1",
+                "version": "1.1.0-2",
                 "cpus": 20,
                 "memory": "{ 30.GB * task.attempt }"
             },
