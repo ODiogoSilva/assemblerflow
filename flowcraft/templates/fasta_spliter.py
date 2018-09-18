@@ -35,7 +35,7 @@ def main():
             # writes the output to fasta store folder inside cwd, respective
             # workdir
             path_to_file = os.path.join(cwd, "fasta_store",
-                                        "_".join(line.split("_")[0:3])
+                                        line.split("_")[0]
                                         .replace(">", "") + ".fas")
             # writes to list of files
             list_files.write(path_to_file + "\n")
