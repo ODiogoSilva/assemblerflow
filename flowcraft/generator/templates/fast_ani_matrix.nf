@@ -19,6 +19,7 @@ process fastAniMatrix_{{ pid }} {
 
     """
     mkdir fasta_store
+    fasta_spliter.py ${fasta}
     fastANI --ql files_fastani.txt --rl files_fastani.txt \
     -t ${task.cpus} --fragLen ${fragLenValue} \
     -o ${sample_id.take(sample_id.lastIndexOf("."))}_fastani.out
