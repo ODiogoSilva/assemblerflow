@@ -6,6 +6,9 @@
 - Fixed issue where `seq_typing` and `patho_typing` processes were not feeding
 report data to report compiler.
 
+### New components
+- Added component `fast_ani`
+
 ## 1.2.2
 
 ### Components changes
