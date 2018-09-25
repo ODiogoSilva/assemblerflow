@@ -14,7 +14,7 @@ process fastAniMatrix_{{ pid }} {
     val fragLenValue from IN_fragLen_{{ pid }}
 
     output:
-    set sample_id, fasta, file("*.out") into fastAniMatrixOutChannel_{{ pid }}
+    set sample_id, fasta, file("*.out")
     {% with task_name="fastAniMatrix", sample_id="sample_id" %}
     {%- include "compiler_channels.txt" ignore missing -%}
     {% endwith %}
