@@ -5,7 +5,11 @@
 ### Components changes
 
 Updated images for components `mash_dist`, `mash_screen` and 
-`mapping_patlas`
+`mapping_patlas`.
+
+### New components
+- Added component `fast_ani`.
+
 
 ## 1.3.0
 
@@ -46,9 +50,6 @@ option.
 report data to report compiler.
 - Fixed fail messages for `process_assembly` and `process_viral_assembly` 
 components
-
-### New components
-- Added component `fast_ani`
 
 ## 1.2.2
 
