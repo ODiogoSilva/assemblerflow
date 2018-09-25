@@ -7,6 +7,8 @@ process fastAniMatrix_{{ pid }} {
 
     tag { sample_id }
 
+     publishDir 'results/fast_ani/fast_ani_{{ pid }}/',
+
     input:
     set sample_id, file(fasta) from {{ input_channel }}
     val fragLenValue from IN_fragLen_{{ pid }}
