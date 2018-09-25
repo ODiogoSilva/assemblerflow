@@ -209,7 +209,6 @@ class FastAniMatrix(Process):
         super().__init__(**kwargs)
 
         self.input_type = "fasta"
-        self.output_type = "out"
 
         self.params = {
             "fragLen": {

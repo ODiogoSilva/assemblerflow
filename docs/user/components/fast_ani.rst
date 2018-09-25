@@ -14,7 +14,7 @@ Input/Output type
 ------------------
 
 - Input type: ``fasta``
-- Output type: ``txt``
+- Output type: ``None``
 
 
 Parameters
