@@ -2,6 +2,12 @@
 
 ## Changes in upcoming release (`dev` branch) 
 
+### Features
+
+- Added a new `clearInput` parameter to components that change their input.
+The aim of this option is to allow the controlled removal of temporary files,
+which is particularly useful in very large workflows.
+
 ### Components changes
 
 - Updated images for components `mash_dist`, `mash_screen` and 
