@@ -1,5 +1,6 @@
 IN_adapter_{{ pid }} = Channel.value(params.adapter{{ param_id }})
 
+clear = params.clearInput{{ param_id }} ? "true" : "false"
 
 process filter_poly_{{ pid }} {
 
@@ -7,6 +8,7 @@ process filter_poly_{{ pid }} {
     {% include "post.txt" ignore missing %}
 
     tag { sample_id }
+    echo true
 
     errorStrategy { task.exitStatus == 120 ? 'ignore' : 'retry' }
 
@@ -32,11 +34,24 @@ process filter_poly_{{ pid }} {
     fi
     done
 
-    prinseq-lite.pl --fastq ${sample_id}_1.fq  --fastq2 ${sample_id}_2.fq  --custom_params "${adapter}" -out_format 3 -out_good ${sample_id}_filtered
+    #prinseq-lite.pl --fastq ${sample_id}_1.fq  --fastq2 ${sample_id}_2.fq  --custom_params "${adapter}" -out_format 3 -out_good ${sample_id}_filtered
+    touch ${sample_id}_filtered_1.fastq
+    touch ${sample_id}_filtered_2.fastq
+    touch "somerhin.fastq"
 
     gzip ${sample_id}_filtered_*.fastq
 
     rm *.fq *.fastq
+
+    if [ "$clear" = "true" ];
+    then
+        work_regex=".*/work/.{2}/.{30}/.*"
+        file_source1=\$(readlink -f \$(pwd)/${fastq_pair[0]})
+        file_source2=\$(readlink -f \$(pwd)/${fastq_pair[1]})
+        if [[ "\$file_source1" =~ \$work_regex ]]; then
+            rm \$file_source1 \$file_source2
+        fi
+    fi
 
     """
 }
