@@ -1,6 +1,7 @@
 IN_adapter_{{ pid }} = Channel.value(params.adapter{{ param_id }})
 
 clear = params.clearInput{{ param_id }} ? "true" : "false"
+checkpointClear_{{ pid }} = Channel.value(clear)
 
 process filter_poly_{{ pid }} {
 
@@ -15,6 +16,7 @@ process filter_poly_{{ pid }} {
     input:
     set sample_id, file(fastq_pair) from {{ input_channel }}
     val adapter from IN_adapter_{{ pid }}
+    val clear from checkpointClear_{{ pid }}
 
     output:
     set sample_id , file("${sample_id}_filtered_{1,2}.fastq.gz") into {{ output_channel }}
