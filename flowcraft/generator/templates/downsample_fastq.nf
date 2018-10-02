@@ -6,7 +6,7 @@ IN_depth_{{ pid }} = Channel.value(params.depth{{ param_id }})
     .map{it -> it.toString().isNumber() ? it : exit(1, "The depth parameter must be a number or a float. Provided value: '${params.depth{{ param_id }}}'")}
 
 IN_seed_{{ pid }} = Channel.value(params.seed{{ param_id }})
-    .map(it -> it.toString().isNumber() ? it : exit(1, "The seed parameter must be a number or a float. Provided value: '$${params.seed{{ param_id }}}'"))
+    .map{it -> it.toString().isNumber() ? it : exit(1, "The seed parameter must be a number or a float. Provided value: '${params.seed{{ param_id }}}'")}
 
 clear = params.clearInput{{ param_id }} ? "true" : "false"
 checkpointClear_{{ pid }} = Channel.value(clear)
