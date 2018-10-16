@@ -6,6 +6,7 @@
 
 - Added removal of duplicate IDs from `reads_download` component input.
 - Added seed parameter to `downsample_fastq` component.
+- Added bacmet database to `abricate` component.
 
 ### Bug fixes
 

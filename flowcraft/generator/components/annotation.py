@@ -59,11 +59,11 @@ class Abricate(Process):
         self.directives = {
             "abricate": {
                 "container": "flowcraft/abricate",
-                "version": "0.8.0-2"
+                "version": "0.8.0-3"
             },
             "process_abricate": {
                 "container": "flowcraft/abricate",
-                "version": "0.8.0-2"
+                "version": "0.8.0-3"
             }
         }
 
