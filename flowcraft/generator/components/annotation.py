@@ -137,7 +137,7 @@ class Prokka(Process):
         self.params = {
             "centre": {
                 "default": "'UMMI'",
-                "description": "sequencin centre ID"
+                "description": "sequencing centre ID"
             },
             "kingdom": {
                 "default": "'Bacteria'",

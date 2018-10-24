@@ -16,7 +16,7 @@ resolution
 
 ### New components
 
-- Added component `abyss`.
+- Added component `abyss`, `prokka`.
 
 ### Minor/Other changes
 
