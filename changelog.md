@@ -20,7 +20,6 @@ resolution
 ### New components
 
 - Added component `abyss`.
-- Added component `abyss`.
 - Added component `bandage`.
 - Added component `unicycler`.
 - Added component `prokka`.
