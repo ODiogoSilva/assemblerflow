@@ -13,10 +13,17 @@ recipes, the `--recipe-list` and `--recipe-list-short` options were added.
 
 - Added new `disableRR` param in the `spades` component that disables repeat
 resolution
+- The `abyss` and `spades` components emit GFA in a secondary channel.
+- The new `bandage` component can accept either FASTA from a primary channel
+  or GFA from a secondary channel.
 
 ### New components
 
-- Added component `abyss`, `prokka`.
+- Added component `abyss`.
+- Added component `abyss`.
+- Added component `bandage`.
+- Added component `unicycler`.
+- Added component `prokka`.
 
 ### Minor/Other changes
 
