@@ -89,6 +89,7 @@ process_map = {
         "momps": typing.Momps,
         "patho_typing": typing.PathoTyping,
         "pilon": ap.Pilon,
+        "porechop": readsqc.Porechop,
         "process_skesa": ap.ProcessSkesa,
         "process_spades": ap.ProcessSpades,
         "progressive_mauve": alignment.ProgressiveMauve,
