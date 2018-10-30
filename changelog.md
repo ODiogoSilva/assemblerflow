@@ -37,6 +37,7 @@ resolution
 
 - Fixed forks with same source process name.
 - Fixed `inspect` issue when tasks took more than a day in duration.
+- Added timestamp to `inpsect` and `report` hash.
 
 ## 1.3.1
 
