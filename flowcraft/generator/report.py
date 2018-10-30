@@ -2,7 +2,7 @@ import os
 import re
 import sys
 import json
-import time
+import uuid
 import signal
 import socket
 import hashlib
@@ -196,8 +196,8 @@ class FlowcraftReport:
             # Get hash from the current working dir and hostname
             workdir = os.getcwd().encode("utf8")
             hostname = socket.gethostname().encode("utf8")
-            timestamp = str(time.time()).encode("utf8")
-            dir_hash = hashlib.md5(workdir + hostname + timestamp)
+            hardware_addr = str(uuid.getnode()).encode("utf8")
+            dir_hash = hashlib.md5(workdir + hostname + hardware_addr)
 
             return pipeline_hash.hexdigest() + dir_hash.hexdigest()
 
