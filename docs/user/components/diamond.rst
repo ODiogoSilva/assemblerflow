@@ -29,7 +29,7 @@ Parameters
   then will try to fetch from the previous process. Default: None
 
 - ``fastaToDb``: Provide the full path for the fasta to construct a diamond
-  database. Default: None"
+  database. Default: None
 
 - ``blastType``: Defines the type of blast that diamond will do. Can wither be
   blastx or blastp. Default: blastx
