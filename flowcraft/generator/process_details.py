@@ -71,6 +71,22 @@ def procs_dict_parser(procs_dict):
                     arg_msg = "None"
                 else:
                     arg_msg = ", ".join(dict_proc_info[info])
+            elif isinstance(dict_proc_info[info], dict):
+                # this is used for the "directives", which is a dict
+                if len(dict_proc_info[info]) == 0:
+                    # if dict is empty then add None to the message
+                    arg_msg = "None"
+                else:
+                    # otherwise fetch all template names within a component
+                    # and all the directives for each template to a list
+                    list_msg = ["\n      {}: {}".format(
+                        templt,
+                        " , ".join(["{}: {}".format(dr, val)
+                                    for dr, val in drs.items()]))
+                                for templt, drs in dict_proc_info[info].items()
+                    ]
+                    # write list to a str
+                    arg_msg = "".join(list_msg)
             else:
                 arg_msg = dict_proc_info[info]
 
@@ -108,7 +124,8 @@ def proc_collector(process_map, args, pipeline_string):
             "output_type",
             "description",
             "dependencies",
-            "conflicts"
+            "conflicts",
+            "directives"
         ]
 
     # prints a short list with each process and the corresponding description
