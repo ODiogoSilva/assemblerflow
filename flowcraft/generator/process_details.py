@@ -73,7 +73,7 @@ def procs_dict_parser(procs_dict):
                     arg_msg = ", ".join(dict_proc_info[info])
             elif isinstance(dict_proc_info[info], dict):
                 # this is used for the "directives", which is a dict
-                if len(dict_proc_info[info]) == 0:
+                if dict_proc_info[info]:
                     # if dict is empty then add None to the message
                     arg_msg = "None"
                 else:
