@@ -3,6 +3,7 @@ import sys
 import json
 import jinja2
 import logging
+import requests
 
 from collections import defaultdict
 from os.path import dirname, join, abspath, split, splitext, exists, basename
@@ -1523,6 +1524,46 @@ class NextflowGenerator:
 
         # Flush params json to stdout
         sys.stdout.write(json.dumps(directives_json))
+
+    def fetch_docker_tags(self):
+        """
+        Export all dockerhub tags associated with each component given by
+        the -t flag.
+        """
+
+        # starts an array with the headers
+        tags_list = [
+            ["component", "container", "tags"],
+        ]
+
+        # Skip first init process and iterate through the others
+        for p in self.processes[1:]:
+            template = p.template
+            # fetch repo name from directives of the template
+            repo = p.directives[template]["container"]
+            # make the request to docker hub
+            r = requests.get(
+                "https://hub.docker.com/v2/repositories/{}/tags/".format(
+                    repo
+                ))
+            # checks the status code of the request, if it is 200 then parses
+            # docker hub entry, otherwise retrieve no tags but alerts the user
+            if r.status_code != 404:
+                # parse response content to dict and fetch results key
+                r_content = json.loads(r.content)["results"]
+                for version in r_content:
+                    tags_list.append([template, repo, version["name"]])
+            else:
+                tags_list.append([template, repo, "No DockerHub tags"])
+
+        # iterate through each entry in tags_list and print the list of tags
+        # for each component
+        for x, entry in enumerate(tags_list):
+            # adds different color to the header in the first list
+            color = "white" if x > 0 else "purple_bold"
+            sys.stdout.write(
+                colored_print("{}\n".format("\t".join(entry)), color)
+            )
 
     def build(self):
         """Main pipeline builder
