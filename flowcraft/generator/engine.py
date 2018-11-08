@@ -1560,8 +1560,14 @@ class NextflowGenerator:
         # Skip first init process and iterate through the others
         for p in self.processes[1:]:
             template = p.template
-            # fetch repo name from directives of the template
-            repo = p.directives[template]["container"]
+            # fetch repo name from directives of the template. Since some
+            # components like integrity_coverage doesn't have a directives with
+            # container, thus if no directive there the script will skip this
+            # template
+            try:
+                repo = p.directives[template]["container"]
+            except KeyError:
+                continue
             # make the request to docker hub
             r = requests.get(
                 "https://hub.docker.com/v2/repositories/{}/tags/".format(
