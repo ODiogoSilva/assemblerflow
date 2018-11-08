@@ -197,7 +197,7 @@ def validate_build_arguments(args):
     if args.detailed_list or args.short_list:
         return
 
-    # Skill all checks when exporting parameters AND providing at least one
+    # Skip all checks when exporting parameters AND providing at least one
     # component
     if args.export_params or args.export_directives or args.fetch_docker_tags:
         # Check if components provided

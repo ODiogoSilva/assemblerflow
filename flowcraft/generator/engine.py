@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import jinja2
+import shutil
 import logging
 import requests
 
@@ -1531,9 +1532,29 @@ class NextflowGenerator:
         the -t flag.
         """
 
-        # starts an array with the headers
+        # fetches terminal width and subtracts 1 because we always add a
+        # new line character
+        terminal_width = shutil.get_terminal_size().columns - 1
+
+        # first header
+        center_string = " Selected container tags "
+
+        # starts a list with the headers
         tags_list = [
+            [
+                "=" * int(terminal_width / 4),
+                "{0}{1}{0}".format(
+                    "=" * int(((terminal_width/2 - len(center_string)) / 2)),
+                    center_string)
+                ,
+                "{}\n".format("=" * int(terminal_width / 4))
+            ],
             ["component", "container", "tags"],
+            [
+                "=" * int(terminal_width / 4),
+                "=" * int(terminal_width / 2),
+                "=" * int(terminal_width / 4)
+            ]
         ]
 
         # Skip first init process and iterate through the others
@@ -1557,13 +1578,28 @@ class NextflowGenerator:
                 tags_list.append([template, repo, "No DockerHub tags"])
 
         # iterate through each entry in tags_list and print the list of tags
-        # for each component
+        # for each component. Each entry (excluding the headers) contains
+        # 3 elements (component name, container and tag version)
         for x, entry in enumerate(tags_list):
-            # adds different color to the header in the first list
-            color = "white" if x > 0 else "purple_bold"
+            # adds different color to the header in the first list and
+            # if row is pair add one color and if is even add another (different
+            # background)
+            color = "blue_bold" if x < 3 else \
+                ("white" if x % 2 != 0 else "0;37;40m")
+            # generates a small list with the terminal width for each column,
+            # this will be given to string formatting as the 3, 4 and 5 element
+            final_width = [
+                int(terminal_width/4),
+                int(terminal_width/2),
+                int(terminal_width/4)
+            ]
+            # writes the string to the stdout
             sys.stdout.write(
-                colored_print("{}\n".format("\t".join(entry)), color)
+                colored_print("\n{0: <{3}} {1: ^{4}} {2: >{5}}".format(
+                    *entry, *final_width), color)
             )
+        # assures that the entire line gets the same color
+        sys.stdout.write("\n")
 
     def build(self):
         """Main pipeline builder
