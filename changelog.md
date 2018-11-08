@@ -18,7 +18,8 @@ resolution
 - The `abyss` and `spades` components emit GFA in a secondary channel.
 - The new `bandage` component can accept either FASTA from a primary channel
   or GFA from a secondary channel.
-- Updated skesa to version 2.3.0
+- Updated skesa to version 2.3.0.
+- Updated mash based components for the latest version - 1.6.0-1.
 
 ### New components
 
@@ -27,6 +28,7 @@ resolution
 - Added component `unicycler`.
 - Added component `prokka`.
 - Added component `bcalm`.
+- Added component `diamond`.
 
 ### Minor/Other changes
 
@@ -41,6 +43,7 @@ resolution
 
 - Fixed forks with same source process name.
 - Fixed `inspect` issue when tasks took more than a day in duration.
+- Added hardware address to `inpsect` and `report` hash.
 
 ## 1.3.1
 
