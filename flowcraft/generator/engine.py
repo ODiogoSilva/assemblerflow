@@ -1447,9 +1447,9 @@ class NextflowGenerator:
         the -t flag.
         """
 
-        # list to store the already parsed components (useful when forks are
+        # dict to store the already parsed components (useful when forks are
         # given to the pipeline string via -t flag
-        list_of_parsed = []
+        dict_of_parsed = {}
 
         # fetches terminal width and subtracts 3 because we always add a
         # new line character and we want a space at the beggining and at the end
@@ -1482,28 +1482,30 @@ class NextflowGenerator:
             template = p.template
             # if component has already been printed then skip and don't print
             # again
-            if template in list_of_parsed:
+            if template in dict_of_parsed:
                 continue
 
-            list_of_parsed.append(template)
+            # starts a list of  containers for the current process in
+            # dict_of_parsed, in which each containers will be added to this
+            # list once it gets parsed
+            dict_of_parsed[template] = {
+                "container": []
+            }
 
-            # creates a list of repos that is used to check if within a
-            # component a given repo was already been added to tags_list
-            list_of_repos = []
             # fetch repo name from directives of each component.
-            for nf_name, directives in p.directives.items():
+            for process_name, directives in p.directives.items():
                 try:
-                    repo = p.directives[nf_name]["container"]
-                    default_version = p.directives[nf_name]["version"]
+                    repo = p.directives[process_name]["container"]
+                    default_version = p.directives[process_name]["version"]
                 except KeyError:
                     # adds the default container if container key isn't present
                     # this happens for instance in integrity_coverage
                     repo = "flowcraft/flowcraft_base"
                     default_version = "1.0.0-1"
-                # checks if repo_version already exists in list_of_repos for
-                # the current component being queried
+                # checks if repo_version already exists in list of the
+                # containers for the current component being queried
                 repo_version = repo + default_version
-                if repo_version not in list_of_repos:
+                if repo_version not in dict_of_parsed[template]["container"]:
                     # make the request to docker hub
                     r = requests.get(
                         "https://hub.docker.com/v2/repositories/{}/tags/"
@@ -1523,7 +1525,7 @@ class NextflowGenerator:
                     else:
                         tags_list.append([template, repo, "No DockerHub tags"])
 
-                list_of_repos.append(repo_version)
+                dict_of_parsed[template]["container"].append(repo_version)
 
         # iterate through each entry in tags_list and print the list of tags
         # for each component. Each entry (excluding the headers) contains
