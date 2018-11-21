@@ -1487,32 +1487,43 @@ class NextflowGenerator:
 
             list_of_parsed.append(template)
 
-            # fetch repo name from directives of the template. Since some
-            # components like integrity_coverage doesn't have a directives with
-            # container, thus if no directive there the script will skip this
-            # template
-            try:
-                repo = p.directives[template]["container"]
-                default_version = p.directives[template]["version"]
-            except KeyError:
-                continue
-            # make the request to docker hub
-            r = requests.get(
-                "https://hub.docker.com/v2/repositories/{}/tags/".format(
-                    repo
-                ))
-            # checks the status code of the request, if it is 200 then parses
-            # docker hub entry, otherwise retrieve no tags but alerts the user
-            if r.status_code != 404:
-                # parse response content to dict and fetch results key
-                r_content = json.loads(r.content)["results"]
-                for version in r_content:
-                    printed_version = (version["name"] + "*") \
-                        if version["name"] == default_version \
-                        else version["name"]
-                    tags_list.append([template, repo, printed_version])
-            else:
-                tags_list.append([template, repo, "No DockerHub tags"])
+            # creates a list of repos that is used to check if within a
+            # component a given repo was already been added to tags_list
+            list_of_repos = []
+            # fetch repo name from directives of each component.
+            for nf_name, directives in p.directives.items():
+                try:
+                    repo = p.directives[nf_name]["container"]
+                    default_version = p.directives[nf_name]["version"]
+                except KeyError:
+                    # adds the default container if container key isn't present
+                    # this happens for instance in integrity_coverage
+                    repo = "flowcraft/flowcraft_base"
+                    default_version = "1.0.0-1"
+                # checks if repo_version already exists in list_of_repos for
+                # the current component being queried
+                repo_version = repo + default_version
+                if repo_version not in list_of_repos:
+                    # make the request to docker hub
+                    r = requests.get(
+                        "https://hub.docker.com/v2/repositories/{}/tags/"
+                        .format(repo)
+                    )
+                    # checks the status code of the request, if it is 200 then
+                    # parses docker hub entry, otherwise retrieve no tags but
+                    # alerts the user
+                    if r.status_code != 404:
+                        # parse response content to dict and fetch results key
+                        r_content = json.loads(r.content)["results"]
+                        for version in r_content:
+                            printed_version = (version["name"] + "*") \
+                                if version["name"] == default_version \
+                                else version["name"]
+                            tags_list.append([template, repo, printed_version])
+                    else:
+                        tags_list.append([template, repo, "No DockerHub tags"])
+
+                list_of_repos.append(repo_version)
 
         # iterate through each entry in tags_list and print the list of tags
         # for each component. Each entry (excluding the headers) contains
