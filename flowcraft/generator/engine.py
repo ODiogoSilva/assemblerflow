@@ -1493,10 +1493,10 @@ class NextflowGenerator:
             }
 
             # fetch repo name from directives of each component.
-            for process_name, directives in p.directives.items():
+            for directives in p.directives.values():
                 try:
-                    repo = p.directives[process_name]["container"]
-                    default_version = p.directives[process_name]["version"]
+                    repo = directives["container"]
+                    default_version = directives["version"]
                 except KeyError:
                     # adds the default container if container key isn't present
                     # this happens for instance in integrity_coverage
