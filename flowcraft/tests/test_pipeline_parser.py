@@ -281,6 +281,7 @@ def test_unique_id_len():
         res_str, res_ids = ps.add_unique_identifiers(pip_str)
         assert res_str.replace(" ", "") == res_list[x].replace(" ", "")
 
+
 def test_remove_id():
 
     pip_list = [
