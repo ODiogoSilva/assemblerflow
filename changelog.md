@@ -2,6 +2,12 @@
 
 ## Changes in upcoming release (`dev` branch) 
 
+
+### New components
+
+- `Kraken2`: Taxonomic identification on FastQ files
+
+
 ### Bug fixes
 
 - Fix bug in `momps`component related to added in the introduction of the clear input parameter
@@ -13,6 +19,8 @@ all the components.
 - Added option to `dengue_typing` to retrive closest referece sequence and link it 
 with a secondary channel into `mafft`
 - New version of DEN-IM recipe
+- Now prints an ordered list of components
+- moved taxonomy results from `results/annotation/` to `results/taxonomy/`
 
 
 ## 1.4.0

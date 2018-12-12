@@ -41,6 +41,42 @@ class Kraken(Process):
             "kraken"
         ]
 
+class Kraken2(Process):
+    """kraken2 process template interface
+
+            This process is set with:
+
+                - ``input_type``: fastq
+                - ``output_type``: txt
+                - ``ptype``: taxonomic classification
+    """
+    def __init__(self, **kwargs):
+
+        super().__init__(**kwargs)
+
+        self.input_type = "fastq"
+        self.output_type = "txt"
+
+        self.params = {
+            "kraken2DB": {
+                "default": "'minikraken2_v1_8GB'",
+                "description": "Specifies kraken2 database."
+            }
+        }
+
+        self.directives = {
+            "kraken2": {
+                "container": "flowcraft/kraken2",
+                "version": "2.0.7-1",
+                "memory": "{8.Gb*task.attempt}",
+                "cpus": 3
+            }
+        }
+
+        self.status_channels = [
+            "kraken2"
+        ]
+
 
 class Maxbin2(Process):
     """MaxBin2, a metagenomics binning software
