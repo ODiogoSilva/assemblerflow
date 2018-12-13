@@ -23,7 +23,7 @@ process kraken2_{{ pid }} {
 
     script:
     """
-    kraken2 --memory-mapping --threads $task.cpus --report ${sample_id}_kraken_report.txt --paired --gzip-compressed ${fastq_pair[0]} ${fastq_pair[1]}
+    kraken2 --memory-mapping --threads $task.cpus --report ${sample_id}_kraken_report.txt --db ${krakenDB} --paired --gzip-compressed ${fastq_pair[0]} ${fastq_pair[1]}
     """
 }
 
