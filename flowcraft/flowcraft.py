@@ -387,15 +387,16 @@ def inspect(args):
     try:
         nf_inspect = NextflowInspector(args.trace_file, args.refresh_rate,
                                        args.pretty, args.url)
+        if args.mode == "overview":
+            nf_inspect.display_overview()
+
+        if args.mode == "broadcast":
+            nf_inspect.broadcast_status()
+
     except eh.InspectionError as e:
         logger.error(colored_print(e.value, "red_bold"))
         sys.exit(1)
 
-    if args.mode == "overview":
-        nf_inspect.display_overview()
-
-    if args.mode == "broadcast":
-        nf_inspect.broadcast_status()
 
 
 def report(args):
@@ -407,11 +408,12 @@ def report(args):
             log_file=args.log_file,
             watch=args.watch,
             ip_addr=args.url)
+
+        fc_report.broadcast_report()
     except eh.ReportError as e:
         logger.error(colored_print(e.value, "red_bold"))
         sys.exit(1)
 
-    fc_report.broadcast_report()
 
 
 def main():
