@@ -9,6 +9,21 @@ except ImportError:
 
 
 def get_nextflow_filepath(log_file, error_mode):
+    """Gets the nextflow file path from the nextflow log file. It searches for
+    the nextflow run command throughout the file.
+
+    Parameters
+    ----------
+    log_file : str
+        Path for the .nextflow.log file
+    error_mode: class
+        Raise error class
+
+    Returns
+    -------
+    str
+        Path for the nextflow file
+    """
 
     with open(log_file) as fh:
         # Searches for the first occurence of the nextflow pipeline
@@ -17,7 +32,8 @@ def get_nextflow_filepath(log_file, error_mode):
             line = fh.readline()
             if not line:
                 # file is empty
-                raise  error_mode("Nextflow command path could not be found - Is .nextflow.log empty?")
+                raise error_mode("Nextflow command path could not be found - Is "
+                                 ".nextflow.log empty?")
             try:
                 # Regex supports absolute paths and relative paths
                 pipeline_path = re.match(".*\s([/\w/]*\w*.nf).*", line) \
