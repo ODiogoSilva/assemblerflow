@@ -1534,7 +1534,7 @@ class NextflowInspector:
         """Gets the hash of the nextflow file"""
 
         # Get name and path of the pipeline from the log file
-        pipeline_path = get_nextflow_filepath(self.log_file, eh.InspectionError)
+        pipeline_path = get_nextflow_filepath(self.log_file)
 
         # Get hash from the entire pipeline file
         pipeline_hash = hashlib.md5()

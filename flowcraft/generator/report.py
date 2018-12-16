@@ -186,7 +186,7 @@ class FlowcraftReport:
 
             # Searches for the first occurence of the nextflow pipeline
             # file name in the .nextflow.log file
-            pipeline_path = get_nextflow_filepath(self.log_file, eh.ReportError)
+            pipeline_path = get_nextflow_filepath(self.log_file)
 
             # Get hash from the entire pipeline file
             pipeline_hash = hashlib.md5()

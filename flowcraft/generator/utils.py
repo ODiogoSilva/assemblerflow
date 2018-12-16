@@ -8,7 +8,7 @@ except ImportError:
     from flowcraft.generator.process_details import colored_print
 
 
-def get_nextflow_filepath(log_file, error_mode):
+def get_nextflow_filepath(log_file):
     """Gets the nextflow file path from the nextflow log file. It searches for
     the nextflow run command throughout the file.
 
@@ -16,8 +16,6 @@ def get_nextflow_filepath(log_file, error_mode):
     ----------
     log_file : str
         Path for the .nextflow.log file
-    error_mode: class
-        Raise error class
 
     Returns
     -------
@@ -32,7 +30,7 @@ def get_nextflow_filepath(log_file, error_mode):
             line = fh.readline()
             if not line:
                 # file is empty
-                raise error_mode("Nextflow command path could not be found - Is "
+                raise eh.LogError("Nextflow command path could not be found - Is "
                                  ".nextflow.log empty?")
             try:
                 # Regex supports absolute paths and relative paths

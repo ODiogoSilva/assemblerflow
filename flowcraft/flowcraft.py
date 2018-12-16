@@ -393,8 +393,12 @@ def inspect(args):
         if args.mode == "broadcast":
             nf_inspect.broadcast_status()
 
-    except eh.InspectionError as e:
-        logger.error(colored_print(e.value, "red_bold"))
+    except eh.InspectionError as ie:
+        logger.error(colored_print(ie.value, "red_bold"))
+        sys.exit(1)
+
+    except eh.LogError as le:
+        logger.error(colored_print(le.value, "red_bold"))
         sys.exit(1)
 
 
@@ -410,10 +414,14 @@ def report(args):
             ip_addr=args.url)
 
         fc_report.broadcast_report()
-    except eh.ReportError as e:
-        logger.error(colored_print(e.value, "red_bold"))
+
+    except eh.ReportError as re:
+        logger.error(colored_print(re.value, "red_bold"))
         sys.exit(1)
 
+    except eh.LogError as le:
+        logger.error(colored_print(le.value, "red_bold"))
+        sys.exit(1)
 
 
 def main():
