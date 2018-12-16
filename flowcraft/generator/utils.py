@@ -2,10 +2,8 @@ import re
 
 try:
     import generator.error_handling as eh
-    from generator.process_details import colored_print
 except ImportError:
     import flowcraft.generator.error_handling as eh
-    from flowcraft.generator.process_details import colored_print
 
 
 def get_nextflow_filepath(log_file):
