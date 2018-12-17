@@ -18,6 +18,9 @@
 - Fixed bug with the `-ft` parameters not retrieving the dockerhub tags for 
 all the components.
 - Fixed bug in the `megahit` process where the fastg mode would break the process
+- Fix inspect and report mode to fetch the nextflow file independently of its 
+position in the `nextflow run` command inside the .nextflow.log file.
+- Fix parsing of .nextflow.log file when searching for `nextflow run` command.
 
 ### Minor/Other changes
 
