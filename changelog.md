@@ -3,16 +3,21 @@
 ## Changes in upcoming release (`dev` branch) 
 
 
+### New features
+
+- Added support for the report system to:
+    - `maxibin2`
+
 ### New components
 
 - `Kraken2`: Taxonomic identification on FastQ files
-
 
 ### Bug fixes
 
 - Fix bug in `momps`component related to added in the introduction of the clear input parameter
 - Fixed bug with the `-ft` parameters not retrieving the dockerhub tags for 
 all the components.
+- Fixed bug in the `megahit` process where the fastg mode would break the process
 
 ### Minor/Other changes
 
