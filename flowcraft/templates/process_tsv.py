@@ -4,7 +4,7 @@ import json
 import csv
 import os
 
-from flowcraft_utils.flowcraft_base import get_logger, MainWrapper
+from flowcraft_utils.flowcraft_base import get_logger
 
 """
 Purpose
