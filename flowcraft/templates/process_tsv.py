@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
 
-import json
-import csv
-import os
-
-from flowcraft_utils.flowcraft_base import get_logger
-
 """
 Purpose
 -------
@@ -24,6 +18,12 @@ Code documentation
 ------------------
 """
 
+import json
+import csv
+import os
+
+from flowcraft_utils.flowcraft_base import get_logger, MainWrapper
+
 __version__ = "1.0.1"
 __build__ = "05.10.2018"
 __template__ = "maxbin2-nf"
@@ -38,7 +38,7 @@ if __file__.endswith(".command.sh"):
     logger.debug("SAMPLE_ID: {}".format(SAMPLE_ID))
     logger.debug("FILE: {}".format(FILE))
 
-
+@MainWrapper
 def main(sample_id, tsv_file):
 
     with open(".report.json", "w") as k:
