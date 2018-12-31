@@ -23,7 +23,7 @@ Parameters
 ----------
 
 - ``kraken2DB``: Specifies kraken2 database. Default: minikraken2_v1_8GB (in path inside the
-provided container)
+default container)
 
 Published results
 -----------------
