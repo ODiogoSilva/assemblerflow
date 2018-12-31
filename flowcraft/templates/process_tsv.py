@@ -41,6 +41,7 @@ if __file__.endswith(".command.sh"):
 @MainWrapper
 def main(sample_id, tsv_file):
 
+    # this data type expects full tables in tsv format
     report_json = {
         "tsvData": [{
             "sample": sample_id,
@@ -49,6 +50,7 @@ def main(sample_id, tsv_file):
     }
 
     #web-app excepts a list with all the values in the table.
+    # TODO: To expend this to other processes other than MaxBin2, this line needs to be reworked
     report_json["tsvData"][0]["data"]["MaxBin2"] = list(csv.reader(open(tsv_file), delimiter='\t'))
 
     with open(".report.json", "w") as k:
