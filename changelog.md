@@ -6,7 +6,7 @@
 ### New features
 
 - Added support for the report system to:
-    - `maxibin2`
+    - `maxbin2`
 
 ### New components
 

@@ -60,7 +60,8 @@ class Kraken2(Process):
         self.params = {
             "kraken2DB": {
                 "default": "'minikraken2_v1_8GB'",
-                "description": "Specifies kraken2 database."
+                "description": "Specifies kraken2 database. Requires full path if database not on"
+                               "KRAKEN2_DB_PATH."
             }
         }
 
