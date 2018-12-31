@@ -55,7 +55,7 @@ class Kraken2(Process):
         super().__init__(**kwargs)
 
         self.input_type = "fastq"
-        self.output_type = "txt"
+        self.output_type = None
 
         self.params = {
             "kraken2DB": {
