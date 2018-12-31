@@ -41,6 +41,7 @@ if __file__.endswith(".command.sh"):
 @MainWrapper
 def main(sample_id, tsv_file):
 
+# TODO this tsvData could be a single object since it only has one element
     # this data type expects full tables in tsv format
     report_json = {
         "tsvData": [{
