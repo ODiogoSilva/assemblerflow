@@ -153,7 +153,7 @@ class NextflowGenerator:
         self.manifest = ""
         """
         str: Stores de manifest directives string for the nextflow pipeline.
-        See :func:`NextflowGenerator.__get_params_string`
+        See :func:`NextflowGenerator._get_manifest_string`
         """
 
         self.user_config = ""
