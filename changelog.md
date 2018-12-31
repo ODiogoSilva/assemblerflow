@@ -2,15 +2,17 @@
 
 ## Changes in upcoming release (`dev` branch) 
 
-
 ### New features
 
 - Added support for the report system to:
     - `maxbin2`
+- Added new `manifest.config` with the pipeline metadata
+
 
 ### New components
 
 - `Kraken2`: Taxonomic identification on FastQ files
+
 
 ### Bug fixes
 
