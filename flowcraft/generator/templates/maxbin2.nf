@@ -33,11 +33,15 @@ process maxbin2_{{ pid }} {
     script:
     """
     {
-        run_MaxBin.pl -contig ${assembly} -out ${sample_id}_maxbin -reads ${fastq[0]} -reads2 ${fastq[1]} -thread $task.cpus -min_contig_length ${minContigLenght} -max_iteration ${maxIterations} -prob_threshold ${probThreshold}
+        run_MaxBin.pl -contig ${assembly} -out ${sample_id}_maxbin -reads ${fastq[0]} -reads2 ${fastq[1]} \
+        -thread $task.cpus -min_contig_length ${minContigLenght} -max_iteration ${maxIterations} \
+        -prob_threshold ${probThreshold}
+
         echo pass > .status
 
         #in case maxbin fails to bin sequences for a sample:
-        if ls *_maxbin.*.fasta 1> /dev/null 2>&1; then echo "true" > bin_status.txt; else echo "false" > false_maxbin.0.fasta; echo "false" > bin_status.txt; fi
+        if ls *_maxbin.*.fasta 1> /dev/null 2>&1; then echo "true" > bin_status.txt; else echo "false" \
+        > false_maxbin.0.fasta; echo "false" > bin_status.txt; fi
 
 
         if [ "$clear" = "true" ];
@@ -82,14 +86,14 @@ process report_maxbin2_{{ pid }}{
 OUT_binned = Channel.create()
 OUT_unbinned = Channel.create()
 
-chanA = Channel.create()
-chanB = Channel.create()
+failedBinning = Channel.create()
+successfulBinning = Channel.create()
 
-binCh_{{ pid }}.choice(chanA, chanB){ it -> it[3].text == "false\n" ? 0 : 1 }
+binCh_{{ pid }}.choice(failedBinning, successfulBinning){ it -> it[3].text == "false\n" ? 0 : 1 }
 
-chanA.map{ it -> [it[0], it[1]] }.into(OUT_unbinned)
+failedBinning.map{ it -> [it[0], it[1]] }.into(OUT_unbinned)
 
-chanB.map{ it -> [it[2].toString().tokenize('/').last().tokenize('.')[0..-2].join('.'), it[2]]}
+successfulBinning.map{ it -> [it[2].toString().tokenize('/').last().tokenize('.')[0..-2].join('.'), it[2]]}
     .transpose()
     .map{it -> [it[1].toString().tokenize('/').last().tokenize('.')[0..-2].join('.'),it[1]]}
     .into(OUT_binned)

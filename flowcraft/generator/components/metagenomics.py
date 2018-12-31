@@ -69,7 +69,7 @@ class Kraken2(Process):
                 "container": "flowcraft/kraken2",
                 "version": "2.0.7-1",
                 "memory": "{8.Gb*task.attempt}",
-                "cpus": 3
+                "cpus": 4
             }
         }
 

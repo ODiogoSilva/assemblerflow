@@ -13,7 +13,7 @@ The following variables are expected whether using NextFlow or the
 - ``tsv``: tsv output.
 Generated output
 ----------------
-- ``.report.jason``: Data structure for the report
+- ``.report.json``: Data structure for the report
 Code documentation
 ------------------
 """

@@ -68,6 +68,7 @@ def procs_dict_parser(procs_dict):
     logger.info(colored_print(
         "\n===== L I S T   O F   P R O C E S S E S =====\n", "green_bold"))
 
+    #Sort to print alphabetically ordered list of processes to ease reading
     procs_dict_ordered = {k: procs_dict[k] for k in sorted(procs_dict)}
 
     for template, dict_proc_info in procs_dict_ordered.items():

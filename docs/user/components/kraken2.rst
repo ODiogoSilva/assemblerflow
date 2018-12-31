@@ -40,4 +40,6 @@ Default directives
 ------------------
 
 - ``container``: flowcraft/kraken2
-- ``version``: 207-1
+- ``version``: 2.0.7-1
+- ``cpus``: 3
+- ``memory``: 5GB (dynamically increased on retry)
