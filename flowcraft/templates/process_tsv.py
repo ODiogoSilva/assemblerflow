@@ -5,17 +5,14 @@ Purpose
 -------
 This module is intended to process the output in tsv
  to generate a report in json format.
+
 Expected input
 --------------
 The following variables are expected whether using NextFlow or the
 :py:func:`main` executor.
 - ``sample_id`` : Sample Identification string.
 - ``tsv``: tsv output.
-Generated output
-----------------
-- ``.report.json``: Data structure for the report
-Code documentation
-------------------
+
 """
 
 import json
