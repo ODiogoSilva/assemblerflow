@@ -28,7 +28,7 @@ position in the `nextflow run` command inside the .nextflow.log file.
 with a secondary channel into `mafft`
 - New version of DEN-IM recipe
 - Now prints an ordered list of components
-- moved taxonomy results from `results/annotation/` to `results/taxonomy/`
+- Moved taxonomy results from `results/annotation/` to `results/taxonomy/`
 
 
 ## 1.4.0
