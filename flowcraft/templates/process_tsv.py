@@ -41,11 +41,18 @@ if __file__.endswith(".command.sh"):
 @MainWrapper
 def main(sample_id, tsv_file):
 
-    with open(".report.json", "w") as k:
-        k.write('{"tsvData":[{"sample":"' + sample_id + '", "data": { "MaxBin2":')
-        k.write(json.dumps(list(csv.reader(open(tsv_file), delimiter='\t'))))
-        k.write('}}]}')
+    report_json = {
+        "tsvData": [{
+            "sample": sample_id,
+            "data": {}
+        }]
+    }
 
+    #web-app excepts a list with all the values in the table.
+    report_json["tsvData"][0]["data"]["MaxBin2"] = list(csv.reader(open(tsv_file), delimiter='\t'))
+
+    with open(".report.json", "w") as k:
+        k.write(json.dumps(report_json))
 
 if __name__ == "__main__":
     main(SAMPLE_ID, FILE)
