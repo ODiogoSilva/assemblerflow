@@ -13,6 +13,8 @@ process runMashDist_{{ pid }} {
 
     tag { sample_id }
 
+    publishDir 'results/mashdist/mashdist_txt_{{ pid }}/'
+
     input:
 //    file refFile from SIDE_mashSketchOutChannel_{{ pid }}.ifEmpty(IN_reference_file_{{ pid }})
     set sample_id, file(fasta) from {{ input_channel }}
