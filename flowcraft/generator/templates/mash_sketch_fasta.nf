@@ -21,7 +21,7 @@ process mashSketchFasta_{{ pid }} {
     {% endwith %}
 
     """
-    mash sketch -k ${kmer} -s ${sketch}  ${fasta}
+    mash sketch -i -k ${kmer} -s ${sketch} ${fasta}
     """
 
 }
