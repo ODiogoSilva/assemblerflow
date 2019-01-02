@@ -15,6 +15,7 @@ all the components.
 - Fix inspect and report mode to fetch the nextflow file independently of its 
 position in the `nextflow run` command inside the .nextflow.log file.
 - Fix parsing of .nextflow.log file when searching for `nextflow run` command.
+- Fixed bug between mash_sketch_fasta and mash_dist.
 
 
 ### Minor/Other changes
