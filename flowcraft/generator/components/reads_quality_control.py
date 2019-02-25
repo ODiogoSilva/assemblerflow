@@ -45,6 +45,11 @@ class IntegrityCoverage(Process):
 
         self.link_start.extend(["SIDE_phred", "SIDE_max_len"])
 
+        self.directives = {"integrity_coverage": {
+            "container": "flowcraft/integrity_coverage",
+            "version": "1.0-1"
+        }}
+
 
 class CheckCoverage(Process):
     """Process template interface for additional integrity_coverage process
@@ -112,7 +117,7 @@ class TrueCoverage(Process):
                 "cpus": 4,
                 "memory": "'1GB'",
                 "container": "flowcraft/true_coverage",
-                "version": "3.2-1"
+                "version": "3.3-1"
             }
         }
 

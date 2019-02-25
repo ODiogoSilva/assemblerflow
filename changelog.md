@@ -11,10 +11,13 @@
 ### New components
 
 - `Kraken2`: Taxonomic identification on FastQ files
+- `insert_size`: calculates the insert size of a sample from mapping the reads
+back to an assembly
 
 ### Bug fixes
 
-- Fix bug in `momps`component related to added in the introduction of the clear input parameter
+- Fix bug in `momps`component added in the introduction of the clear 
+input option
 - Fixed bug with the `-ft` parameters not retrieving the dockerhub tags for 
 all the components.
 - Fixed bug in the `megahit` process where the fastg mode would break the process
@@ -25,7 +28,13 @@ position in the `nextflow run` command inside the .nextflow.log file.
 
 ### Minor/Other changes
 
-- Added option to `dengue_typing` to retrive closest referece sequence and link it 
+- Added `insert_size` to `innuca` recipe
+- `integrity_coverage` now checks the integrity of the compressed read files with the 
+appropriate software. 
+- `mlst` component now has it's own process template
+- `assembly_mapping` now verifies the percentage of mapped reads, issuing a quality 
+control warning when it falls bellow 95% 
+- Added option to `dengue_typing` to retrieve closest reference sequence and link it 
 with a secondary channel into `mafft`
 - New version of DEN-IM recipe
 - Now prints an ordered list of components
