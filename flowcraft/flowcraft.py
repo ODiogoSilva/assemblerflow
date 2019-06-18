@@ -361,8 +361,6 @@ def build(args):
     # copy template to cwd, to allow for immediate execution
     if not args.pipeline_only:
         copy_project(parsed_output_nf)
-    else:
-        os.mkdir(os.path.join(dirname(parsed_output_nf), "resources"))
 
     if args.export_params:
         nfg.export_params()

@@ -1310,7 +1310,11 @@ class NextflowGenerator:
             to html file and here for the treeDag.json, stored in the resources directory
 
         """
-        outfile_dag = open(os.path.join(dirname(self.nf_file), "resources", output_file), "w")
+        resources_dir = os.path.join(dirname(self.nf_file), "resources")
+
+        if not os.path.exists(resources_dir):
+            os.mkdir(resources_dir)
+        outfile_dag = open(os.path.join(resources_dir, output_file), "w")
         outfile_dag.write(json.dumps(dict_viz))
         outfile_dag.close()
 
@@ -1381,7 +1385,11 @@ class NextflowGenerator:
         self.dag_to_file(dict_viz)
 
         # Write tree forking information
-        outfile_tree_fork = open(os.path.join(dirname(self.nf_file), "resources", "forkTree.json"), "w")
+        resources_dir = os.path.join(dirname(self.nf_file), "resources")
+
+        if not os.path.exists(resources_dir):
+            os.mkdir(resources_dir)
+        outfile_tree_fork = open(os.path.join(resources_dir, "forkTree.json"), "w")
         outfile_tree_fork.write(json.dumps(dict_viz))
         outfile_tree_fork.close()
 
