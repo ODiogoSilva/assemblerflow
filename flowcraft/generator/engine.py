@@ -1277,7 +1277,6 @@ class NextflowGenerator:
         resources = ""
         containers = ""
         params = ""
-        manifest = ""
 
         if self.merge_params:
             params += self._get_merged_params_string()
@@ -1319,21 +1318,20 @@ class NextflowGenerator:
         })
         self.user_config = self._render_config("user.config", {})
 
-    def dag_to_file(self, dict_viz, output_file=".treeDag.json"):
+    def dag_to_file(self, dict_viz, output_file="treeDag.json"):
         """Writes dag to output file
 
         Parameters
         ----------
         dict_viz: dict
             Tree like dictionary that is used to export tree data of processes
-            to html file and here for the dotfile .treeDag.json
+            to html file and here for the treeDag.json, stored in the resources directory
 
         """
-
-        outfile_dag = open(os.path.join(dirname(self.nf_file), output_file)
-                           , "w")
+        outfile_dag = open(os.path.join(dirname(self.nf_file), "resources", output_file), "w")
         outfile_dag.write(json.dumps(dict_viz))
         outfile_dag.close()
+
 
     def render_pipeline(self):
         """Write pipeline attributes to json
@@ -1401,10 +1399,10 @@ class NextflowGenerator:
         # write to file dict_viz
         self.dag_to_file(dict_viz)
 
-        # Write tree forking information for dotfile
-        with open(os.path.join(dirname(self.nf_file),
-                               ".forkTree.json"), "w") as fh:
-            fh.write(json.dumps(self._fork_tree))
+        # Write tree forking information
+        outfile_tree_fork = open(os.path.join(dirname(self.nf_file), "resources", "forkTree.json"), "w")
+        outfile_tree_fork.write(json.dumps(dict_viz))
+        outfile_tree_fork.close()
 
         # send with jinja to html resource
         return self._render_config("pipeline_graph.html", {"data": dict_viz})
