@@ -1,5 +1,12 @@
 # Changelog
 
+## Upcoming in `dev` 
+
+### Minor/Other changes
+
+- `treeDag.json` and `forktree.json` files are no longer hidden and are now stored in the 
+`resources` directory
+
 ## 1.4.2
 
 ### New components
