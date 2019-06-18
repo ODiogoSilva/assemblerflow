@@ -1277,6 +1277,7 @@ class NextflowGenerator:
         resources = ""
         containers = ""
         params = ""
+        config = ""
 
         if self.merge_params:
             params += self._get_merged_params_string()
@@ -1331,7 +1332,6 @@ class NextflowGenerator:
         outfile_dag = open(os.path.join(dirname(self.nf_file), "resources", output_file), "w")
         outfile_dag.write(json.dumps(dict_viz))
         outfile_dag.close()
-
 
     def render_pipeline(self):
         """Write pipeline attributes to json
