@@ -1465,8 +1465,8 @@ class NextflowInspector:
         return pipeline_files
 
     def _dag_file_to_dict(self):
-        """Function that opens the accessory named treeDag.json in the
-        resources directory
+        """Function that opens the accessory file treeDag.json in the
+        resources directory and loads it's contents to a dictionary
 
         Returns
         -------

@@ -1300,23 +1300,23 @@ class NextflowGenerator:
         })
         self.user_config = self._render_config("user.config", {})
 
-    def dag_to_file(self, dict_viz, output_file="treeDag.json"):
-        """Writes dag to output file
+    def dag_info_to_file(self, dict_viz, output_folder, output_file):
+        """Writes dag or fork information to output file
 
         Parameters
         ----------
         dict_viz: dict
             Tree like dictionary that is used to export tree data of processes
             to html file and here for the treeDag.json, stored in the resources directory
+        output_folder: str
+            Path folder to save the output file
+        output_file: str
+            Output file name
 
         """
-        resources_dir = os.path.join(dirname(self.nf_file), "resources")
 
-        if not os.path.exists(resources_dir):
-            os.mkdir(resources_dir)
-        outfile_dag = open(os.path.join(resources_dir, output_file), "w")
-        outfile_dag.write(json.dumps(dict_viz))
-        outfile_dag.close()
+        with open(os.path.join(output_folder, output_file), "w") as outfile:
+            outfile.write(json.dumps(dict_viz))
 
     def render_pipeline(self):
         """Write pipeline attributes to json
@@ -1381,17 +1381,16 @@ class NextflowGenerator:
 
                 last_of_us[p.lane] = lst[-1]["children"]
 
-        # write to file dict_viz
-        self.dag_to_file(dict_viz)
-
-        # Write tree forking information
+        #check if resources dir exists - necessary for dag files
         resources_dir = os.path.join(dirname(self.nf_file), "resources")
-
         if not os.path.exists(resources_dir):
             os.mkdir(resources_dir)
-        outfile_tree_fork = open(os.path.join(resources_dir, "forkTree.json"), "w")
-        outfile_tree_fork.write(json.dumps(dict_viz))
-        outfile_tree_fork.close()
+
+        # write to file dict_viz
+        self.dag_info_to_file(dict_viz, resources_dir, "treeDag.json")
+
+        # Write tree forking information
+        self.dag_info_to_file(self._fork_tree, resources_dir, "forkTree.json")
 
         # send with jinja to html resource
         return self._render_config("pipeline_graph.html", {"data": dict_viz})
