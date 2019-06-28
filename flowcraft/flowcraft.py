@@ -359,6 +359,7 @@ def build(args):
     logger.info(colored_print("Building your awesome pipeline..."))
 
     # copy template to cwd, to allow for immediate execution
+    # this is executed before the build() method to avoid issues with the resources/ folder
     if not args.pipeline_only:
         copy_project(parsed_output_nf)
 
