@@ -1381,7 +1381,7 @@ class NextflowGenerator:
 
                 last_of_us[p.lane] = lst[-1]["children"]
 
-        #check if resources dir exists - necessary for dag files
+        # check if resources dir exists - necessary for dag files
         resources_dir = os.path.join(dirname(self.nf_file), "resources")
         if not os.path.exists(resources_dir):
             os.mkdir(resources_dir)
