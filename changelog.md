@@ -12,6 +12,7 @@ down-sampling occurring
 
 - `treeDag.json` and `forktree.json` files are no longer hidden and are now stored in the 
 `resources` directory
+- `trimmomatic` now forces `-phred33` when the encoding can't be determined
 
 ## 1.4.2
 

@@ -46,7 +46,7 @@ Code documentation
 
 # TODO: More control over read trimming
 # TODO: Add option to remove adapters
-# TODO: What to do when there is encoding failure
+# TODO: What to do when there is encoding failure - forcing phred33 at the moment
 
 __version__ = "1.0.3"
 __build__ = "29062018"
@@ -329,10 +329,12 @@ def main(sample_id, fastq_pair, trim_range, trim_opts, phred, adapters_file,
         phred = int(phred)
         phred_flag = "-phred{}".format(str(phred))
         cli += [phred_flag]
-    # Could not detect phred encoding. Do not add explicit encoding to
-    # trimmomatic and let it guess
+    # Could not detect phred encoding.
+    # Forcing as phred33 to avoid encoding errors
     except ValueError:
-        pass
+        logger.info("Could not detect quality encoding. Setting it to phred33")
+        phred_flag = "-phred33"
+        cli += [phred_flag]
 
     # Add input samples to CLI
     cli += fastq_pair
