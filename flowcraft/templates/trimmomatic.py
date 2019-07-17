@@ -429,8 +429,12 @@ def main(sample_id, fastq_pair, trim_range, trim_opts, phred, adapters_file,
         if returncode != 0:
             # retry to run trimmomatic by changing the encoding from phred33 to phred64
             if "-phred33" in cli:
+
+                logger.info("Trimmomatic failed while running with phred33. Setting it to phred64 and trying again...")
                 cli[7] = "-phred64"
+
                 returncode = run_trimmomatic(cli, logfile, sample_id)
+
                 if returncode != 0:
                     status_fh.write("fail")
                     return
