@@ -65,8 +65,8 @@ class CollectInitialMetadata {
 
     public static void print_metadata(nextflow.script.WorkflowMetadata workflow){
 
-        def treeDag = new File(".treeDag.json").text
-        def forkTree = new File(".forkTree.json").text
+        def treeDag = new File("${workflow.projectDir}/resources/treeDag.json").text
+        def forkTree = new File("${workflow.projectDir}/resources/forkTree.json").text
 
         def metadataJson = "{'nfMetadata':{'scriptId':'${workflow.scriptId}',\
 'scriptName':'${workflow.scriptName}',\

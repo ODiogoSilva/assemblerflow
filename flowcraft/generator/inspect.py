@@ -1,6 +1,7 @@
 import re
 import os
 import sys
+import uuid
 import time
 import curses
 import signal
@@ -19,9 +20,11 @@ from collections import defaultdict, OrderedDict
 try:
     import generator.error_handling as eh
     from generator.process_details import colored_print
+    from generator.utils import get_nextflow_filepath
 except ImportError:
     import flowcraft.generator.error_handling as eh
     from flowcraft.generator.process_details import colored_print
+    from flowcraft.generator.utils import get_nextflow_filepath
 
 locale.setlocale(locale.LC_ALL, "")
 code = locale.getpreferredencoding()
@@ -50,6 +53,10 @@ def signal_handler(screen):
 class NextflowInspector:
 
     MAX_RETRIES = 1000
+    """
+    int: Number of retries for parsing trace and log files. Only exit with non-0
+    error code after these retries.
+    """
 
     def __init__(self, trace_file, refresh_rate, pretty=False, ip_addr=None):
 
@@ -196,7 +203,7 @@ class NextflowInspector:
         """
 
         if not ip_addr:
-            self.app_address = "http://192.92.149.169:80/"
+            self.app_address = "http://www.flowcraft.live:80/"
         else:
             self.app_address = ip_addr
             """
@@ -474,7 +481,10 @@ class NextflowInspector:
 
         with open(self.log_file) as fh:
 
-            first_line = next(fh)
+            try:
+                first_line = next(fh)
+            except:
+                raise eh.InspectionError("Could not read .nextflow.log file. Is file empty?")
             time_str = " ".join(first_line.split()[:2])
             self.time_start = time_str
 
@@ -1455,8 +1465,8 @@ class NextflowInspector:
         return pipeline_files
 
     def _dag_file_to_dict(self):
-        """Function that opens the dotfile named .treeDag.json in the current
-        working directory
+        """Function that opens the accessory file treeDag.json in the
+        resources directory and loads it's contents to a dictionary
 
         Returns
         -------
@@ -1465,11 +1475,11 @@ class NextflowInspector:
 
         """
         try:
-            dag_file = open(os.path.join(self.workdir, ".treeDag.json"))
+            dag_file = open(os.path.join(self.workdir, "resources", "treeDag.json"))
             dag_json = json.load(dag_file)
         except (FileNotFoundError, json.decoder.JSONDecodeError):
             logger.warning(colored_print(
-                "WARNING: dotfile named .treeDag.json not found or corrupted",
+                "WARNING: JSON file named treeDag.json not found or corrupted",
                 "red_bold"))
             dag_json = {}
 
@@ -1523,10 +1533,8 @@ class NextflowInspector:
     def _get_run_hash(self):
         """Gets the hash of the nextflow file"""
 
-        # Get name of the pipeline from the log file
-        with open(self.log_file) as fh:
-            header = fh.readline()
-        pipeline_path = re.match(".*nextflow run ([^\s]+).*", header).group(1)
+        # Get name and path of the pipeline from the log file
+        pipeline_path = get_nextflow_filepath(self.log_file)
 
         # Get hash from the entire pipeline file
         pipeline_hash = hashlib.md5()
@@ -1536,7 +1544,8 @@ class NextflowInspector:
         # Get hash from the current working dir and hostname
         workdir = self.workdir.encode("utf8")
         hostname = socket.gethostname().encode("utf8")
-        dir_hash = hashlib.md5(workdir + hostname)
+        hardware_addr = str(uuid.getnode()).encode("utf8")
+        dir_hash = hashlib.md5(workdir + hostname + hardware_addr)
 
         return pipeline_hash.hexdigest() + dir_hash.hexdigest()
 

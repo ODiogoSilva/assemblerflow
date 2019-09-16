@@ -2,7 +2,9 @@ import os
 import sys
 import json
 import jinja2
+import shutil
 import logging
+import requests
 
 from collections import defaultdict
 from os.path import dirname, join, abspath, split, splitext, exists, basename
@@ -12,19 +14,6 @@ logger = logging.getLogger("main.{}".format(__name__))
 
 try:
     import generator.process as pc
-    import generator.components.alignment as alignment
-    import generator.components.assembly as assembly
-    import generator.components.annotation as annotation
-    import generator.components.assembly_processing as ap
-    import generator.components.downloads as downloads
-    import generator.components.mapping as mapping
-    import generator.components.distance_estimation as distest
-    import generator.components.metagenomics as meta
-    import generator.components.patlas_mapping as mapping_patlas
-    import generator.components.phylogeny as phylogeny
-    import generator.components.mlst as mlst
-    import generator.components.reads_quality_control as readsqc
-    import generator.components.typing as typing
     import generator.error_handling as eh
     from __init__ import __version__
     from generator import header_skeleton as hs
@@ -33,19 +22,6 @@ try:
     from generator.pipeline_parser import guess_process
 except ImportError:
     import flowcraft.generator.process as pc
-    import flowcraft.generator.components.alignment as alignment
-    import flowcraft.generator.components.assembly as assembly
-    import flowcraft.generator.components.annotation as annotation
-    import flowcraft.generator.components.assembly_processing as ap
-    import flowcraft.generator.components.downloads as downloads
-    import flowcraft.generator.components.mapping as mapping
-    import flowcraft.generator.components.distance_estimation as distest
-    import flowcraft.generator.components.mlst as mlst
-    import flowcraft.generator.components.metagenomics as meta
-    import flowcraft.generator.components.patlas_mapping as mapping_patlas
-    import flowcraft.generator.components.phylogeny as phylogeny
-    import flowcraft.generator.components.reads_quality_control as readsqc
-    import flowcraft.generator.components.typing as typing
     import flowcraft.generator.error_handling as eh
     from flowcraft import __version__
     from flowcraft.generator import header_skeleton as hs
@@ -54,73 +30,19 @@ except ImportError:
     from flowcraft.generator.pipeline_parser import guess_process
 
 
-process_map = {
-        "abricate": annotation.Abricate,
-        "assembly_mapping": ap.AssemblyMapping,
-        "bowtie": mapping.Bowtie,
-        "card_rgi": annotation.CardRgi,
-        "check_coverage": readsqc.CheckCoverage,
-        "chewbbaca": mlst.Chewbbaca,
-        "dengue_typing": typing.DengueTyping,
-        "downsample_fastq": readsqc.DownsampleFastq,
-        "fastqc": readsqc.FastQC,
-        "fastqc_trimmomatic": readsqc.FastqcTrimmomatic,
-        "filter_poly": readsqc.FilterPoly,
-        "integrity_coverage": readsqc.IntegrityCoverage,
-        "fasterq_dump": downloads.FasterqDump,
-        "fast_ani": distest.FastAniMatrix,
-        "kraken": meta.Kraken,
-        "mafft": alignment.Mafft,
-        "mapping_patlas": mapping_patlas.PatlasMapping,
-        "mash_dist": distest.PatlasMashDist,
-        "mash_screen": distest.PatlasMashScreen,
-        "mash_sketch_fasta": distest.MashSketchFasta,
-        "mash_sketch_fastq": distest.MashSketchFastq,
-        "maxbin2": meta.MaxBin2,
-        "megahit": meta.Megahit,
-        "metamlst": mlst.MetaMlst,
-        "metaprob": meta.MetaProb,
-        "metaspades": meta.Metaspades,
-        "midas_species": meta.Midas_species,
-        "mlst": mlst.Mlst,
-        "momps": typing.Momps,
-        "patho_typing": typing.PathoTyping,
-        "pilon": ap.Pilon,
-        "process_skesa": ap.ProcessSkesa,
-        "process_spades": ap.ProcessSpades,
-        "progressive_mauve":alignment.ProgressiveMauve,
-        #"prokka": annotation.Prokka,
-        "raxml": phylogeny.Raxml,
-        "reads_download": downloads.DownloadReads,
-        "remove_host": meta.RemoveHost,
-        "retrieve_mapped": mapping.Retrieve_mapped,
-        "seq_typing": typing.SeqTyping,
-        "sistr": typing.Sistr,
-        "skesa": assembly.Skesa,
-        "spades": assembly.Spades,
-        "split_assembly": meta.SplitAssembly,
-        "trimmomatic": readsqc.Trimmomatic,
-        "true_coverage": readsqc.TrueCoverage,
-        "viral_assembly": assembly.ViralAssembly
-}
-
-"""
-dict: Maps the process ids to the corresponding template interface class wit
-the format::
-
-    {
-        "<template_string>": module.TemplateClass
-    }
-"""
-
-
 class NextflowGenerator:
 
-    def __init__(self, process_connections, nextflow_file,
+    def __init__(self, process_connections, nextflow_file, process_map,
                  pipeline_name="flowcraft", ignore_dependencies=False,
                  auto_dependency=True, merge_params=True, export_params=False):
 
         self.processes = []
+
+        self.process_map = process_map
+        """
+        dict: Maps the nextflow template name to the corresponding Process
+        class of the component.
+        """
 
         # Create the processes attribute with the first special init process.
         # This process will handle the forks of the raw input channels and
@@ -226,6 +148,12 @@ class NextflowGenerator:
         """
         str: Stores the params directives string for the nextflow pipeline.
         See :func:`NextflowGenerator._get_params_string`
+        """
+
+        self.config = ""
+        """
+        str: Stores de configuration for the nextflow pipeline.
+        See :func:`NextflowGenerator._get_config_string`
         """
 
         self.user_config = ""
@@ -342,15 +270,15 @@ class NextflowGenerator:
                 con, p)
 
             # Check if process is available or correctly named
-            if p_out_name not in process_map:
+            if p_out_name not in self.process_map:
                 logger.error(colored_print(
                     "\nThe process '{}' is not available."
                         .format(p_out_name), "red_bold"))
-                guess_process(p_out_name, process_map)
+                guess_process(p_out_name, self.process_map)
                 sys.exit(1)
 
             # Instance output process
-            out_process = process_map[p_out_name](template=p_out_name)
+            out_process = self.process_map[p_out_name](template=p_out_name)
 
             # Update directives, if provided
             if out_directives:
@@ -370,7 +298,7 @@ class NextflowGenerator:
             # output process forks from the raw input user data
             if p_in_name != "__init__":
                 # Create instance of input process
-                in_process = process_map[p_in_name](template=p_in_name)
+                in_process = self.process_map[p_in_name](template=p_in_name)
                 # Test if two processes can be connected by input/output types
                 logger.debug("[{}] Testing connection between input and "
                              "output processes".format(p))
@@ -498,7 +426,7 @@ class NextflowGenerator:
             Process ID.
         """
 
-        dependency_proc = process_map[template](template=template)
+        dependency_proc = self.process_map[template](template=template)
 
         if dependency_proc.input_type != p.input_type:
             logger.error("Cannot automatically add dependency with different"
@@ -1331,6 +1259,7 @@ class NextflowGenerator:
         resources = ""
         containers = ""
         params = ""
+        config = ""
 
         if self.merge_params:
             params += self._get_merged_params_string()
@@ -1359,6 +1288,10 @@ class NextflowGenerator:
         self.params = self._render_config("params.config", {
             "params_info": params
         })
+        self.config = self._render_config("nextflow.config", {
+            "pipeline_name": self.pipeline_name,
+            "nf_file": self.nf_file
+        })
         self.help = self._render_config("Helper.groovy", {
             "nf_file": basename(self.nf_file),
             "help_list": help_list,
@@ -1367,21 +1300,23 @@ class NextflowGenerator:
         })
         self.user_config = self._render_config("user.config", {})
 
-    def dag_to_file(self, dict_viz, output_file=".treeDag.json"):
-        """Writes dag to output file
+    def dag_info_to_file(self, dict_viz, output_folder, output_file):
+        """Writes dag or fork information to output file
 
         Parameters
         ----------
         dict_viz: dict
             Tree like dictionary that is used to export tree data of processes
-            to html file and here for the dotfile .treeDag.json
+            to html file and here for the treeDag.json, stored in the resources directory
+        output_folder: str
+            Path folder to save the output file
+        output_file: str
+            Output file name
 
         """
 
-        outfile_dag = open(os.path.join(dirname(self.nf_file), output_file)
-                           , "w")
-        outfile_dag.write(json.dumps(dict_viz))
-        outfile_dag.close()
+        with open(os.path.join(output_folder, output_file), "w") as outfile:
+            outfile.write(json.dumps(dict_viz))
 
     def render_pipeline(self):
         """Write pipeline attributes to json
@@ -1446,13 +1381,16 @@ class NextflowGenerator:
 
                 last_of_us[p.lane] = lst[-1]["children"]
 
-        # write to file dict_viz
-        self.dag_to_file(dict_viz)
+        # check if resources dir exists - necessary for dag files
+        resources_dir = os.path.join(dirname(self.nf_file), "resources")
+        if not os.path.exists(resources_dir):
+            os.mkdir(resources_dir)
 
-        # Write tree forking information for dotfile
-        with open(os.path.join(dirname(self.nf_file),
-                               ".forkTree.json"), "w") as fh:
-            fh.write(json.dumps(self._fork_tree))
+        # write to file dict_viz
+        self.dag_info_to_file(dict_viz, resources_dir, "treeDag.json")
+
+        # Write tree forking information
+        self.dag_info_to_file(self._fork_tree, resources_dir, "forkTree.json")
 
         # send with jinja to html resource
         return self._render_config("pipeline_graph.html", {"data": dict_viz})
@@ -1473,6 +1411,10 @@ class NextflowGenerator:
         # Write containers config
         with open(join(project_root, "params.config"), "w") as fh:
             fh.write(self.params)
+
+        # Write nextflow config
+        with open(join(project_root, "nextflow.config"), "w") as fh:
+            fh.write(self.config)
 
         # Write user config if not present in the project directory
         if not exists(join(project_root, "user.config")):
@@ -1518,6 +1460,117 @@ class NextflowGenerator:
 
         # Flush params json to stdout
         sys.stdout.write(json.dumps(directives_json))
+
+    def fetch_docker_tags(self):
+        """
+        Export all dockerhub tags associated with each component given by
+        the -t flag.
+        """
+
+        # dict to store the already parsed components (useful when forks are
+        # given to the pipeline string via -t flag
+        dict_of_parsed = {}
+
+        # fetches terminal width and subtracts 3 because we always add a
+        # new line character and we want a space at the beggining and at the end
+        # of each line
+        terminal_width = shutil.get_terminal_size().columns - 3
+
+        # first header
+        center_string = " Selected container tags "
+
+        # starts a list with the headers
+        tags_list = [
+            [
+                "=" * int(terminal_width / 4),
+                "{0}{1}{0}".format(
+                    "=" * int(((terminal_width/2 - len(center_string)) / 2)),
+                    center_string)
+                ,
+                "{}\n".format("=" * int(terminal_width / 4))
+            ],
+            ["component", "container", "tags"],
+            [
+                "=" * int(terminal_width / 4),
+                "=" * int(terminal_width / 2),
+                "=" * int(terminal_width / 4)
+            ]
+        ]
+
+        # Skip first init process and iterate through the others
+        for p in self.processes[1:]:
+            template = p.template
+            # if component has already been printed then skip and don't print
+            # again
+            if template in dict_of_parsed:
+                continue
+
+            # starts a list of  containers for the current process in
+            # dict_of_parsed, in which each containers will be added to this
+            # list once it gets parsed
+            dict_of_parsed[template] = {
+                "container": []
+            }
+
+            # fetch repo name from directives of each component.
+            for directives in p.directives.values():
+                try:
+                    repo = directives["container"]
+                    default_version = directives["version"]
+                except KeyError:
+                    # adds the default container if container key isn't present
+                    # this happens for instance in integrity_coverage
+                    repo = "flowcraft/flowcraft_base"
+                    default_version = "1.0.0-1"
+                # checks if repo_version already exists in list of the
+                # containers for the current component being queried
+                repo_version = repo + default_version
+                if repo_version not in dict_of_parsed[template]["container"]:
+                    # make the request to docker hub
+                    r = requests.get(
+                        "https://hub.docker.com/v2/repositories/{}/tags/"
+                        .format(repo)
+                    )
+                    # checks the status code of the request, if it is 200 then
+                    # parses docker hub entry, otherwise retrieve no tags but
+                    # alerts the user
+                    if r.status_code != 404:
+                        # parse response content to dict and fetch results key
+                        r_content = json.loads(r.content)["results"]
+                        for version in r_content:
+                            printed_version = (version["name"] + "*") \
+                                if version["name"] == default_version \
+                                else version["name"]
+                            tags_list.append([template, repo, printed_version])
+                    else:
+                        tags_list.append([template, repo, "No DockerHub tags"])
+
+                dict_of_parsed[template]["container"].append(repo_version)
+
+        # iterate through each entry in tags_list and print the list of tags
+        # for each component. Each entry (excluding the headers) contains
+        # 3 elements (component name, container and tag version)
+        for x, entry in enumerate(tags_list):
+            # adds different color to the header in the first list and
+            # if row is pair add one color and if is even add another (different
+            # background)
+            color = "blue_bold" if x < 3 else \
+                ("white" if x % 2 != 0 else "0;37;40m")
+            # generates a small list with the terminal width for each column,
+            # this will be given to string formatting as the 3, 4 and 5 element
+            final_width = [
+                int(terminal_width/4),
+                int(terminal_width/2),
+                int(terminal_width/4)
+            ]
+            # writes the string to the stdout
+            sys.stdout.write(
+                colored_print("\n {0: <{3}} {1: ^{4}} {2: >{5}}".format(
+                    *entry, *final_width), color)
+            )
+        # assures that the entire line gets the same color
+        sys.stdout.write("\n{0: >{1}}\n".format("(* = default)",
+                                                terminal_width + 3))
 
     def build(self):
         """Main pipeline builder

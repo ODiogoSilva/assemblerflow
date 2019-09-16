@@ -51,8 +51,29 @@ def test_build_file_2(tmp):
                         "{}".format(p), "--pipeline-only"])
     af.build(args)
 
-    assert sorted(os.listdir(tmp)) == [".forkTree.json", ".treeDag.json",
-                                       "containers.config",
-                                       "lib", "params.config",
-                                       "resources.config", "teste.html",
+    assert sorted(os.listdir(tmp)) == ["containers.config",
+                                       "lib", "nextflow.config", "params.config",
+                                       "resources", "resources.config", "teste.html",
                                        "teste.nf", "user.config"]
+
+    assert sorted(os.listdir(os.path.join(tmp, "resources"))) == ["forkTree.json", "treeDag.json"]
+
+
+def test_build_recipe(tmp):
+
+    sys.argv.append(1)
+    p = os.path.join(os.path.abspath(tmp), "teste.nf")
+
+    args = af.get_args(["build", "-r", "innuca", "-o",
+                        "{}".format(p), "--pipeline-only"])
+    af.build(args)
+
+
+def test_build_recipe_innuendo(tmp):
+
+    sys.argv.append(1)
+    p = os.path.join(os.path.abspath(tmp), "teste.nf")
+
+    args = af.get_args(["build", "-r", "innuendo", "-o",
+                        "{}".format(p), "--pipeline-only"])
+    af.build(args)

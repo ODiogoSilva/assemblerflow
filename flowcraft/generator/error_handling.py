@@ -26,5 +26,15 @@ class ReportError(Exception):
     def __init__(self, value):
         self.value = "Reports ERROR: {}".format(value)
 
+
+class RecipeError(Exception):
+    def __init__(self, value):
+        self.value = "Recipe ERROR: {}".format(value)
+
     # def __str__(self):
     #     return repr(self.value)
+
+
+class LogError(Exception):
+    def __init__(self, value):
+        self.value = "Log ERROR: {}".format(value)

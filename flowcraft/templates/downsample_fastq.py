@@ -36,14 +36,15 @@ Code documentation
 
 """
 
-__version__ = "1.0.0"
-__build__ = "30072018"
+__version__ = "1.0.1"
+__build__ = "21062019"
 __template__ = "sample_fastq-nf"
 
 import os
 import re
 import json
 import subprocess
+import shutil
 
 from os.path import basename
 

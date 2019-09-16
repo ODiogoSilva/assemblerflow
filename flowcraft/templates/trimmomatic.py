@@ -46,7 +46,7 @@ Code documentation
 
 # TODO: More control over read trimming
 # TODO: Add option to remove adapters
-# TODO: What to do when there is encoding failure
+# TODO: What to do when there is encoding failure - forcing phred33 at the moment
 
 __version__ = "1.0.3"
 __build__ = "29062018"
@@ -57,6 +57,7 @@ import re
 import json
 import fileinput
 import subprocess
+import tempfile
 
 from subprocess import PIPE
 from collections import OrderedDict
@@ -226,11 +227,14 @@ def trimmomatic_log(log_file, sample_id):
 
     log_storage = OrderedDict()
 
-    log_id = log_file.rstrip("_trimlog.txt")
+    log_storage[sample_id] = parse_log(log_file)
 
-    log_storage[log_id] = parse_log(log_file)
+    #remove temp dir where log file is stored
+    tempdir = os.path.dirname(log_file)
 
     os.remove(log_file)
+
+    os.rmdir(tempdir)
 
     write_report(log_storage, "trimmomatic_report.csv", sample_id)
 
@@ -274,9 +278,46 @@ def merge_default_adapters():
     with open(filepath, "w") as fh, \
             fileinput.input(default_adapters) as in_fh:
         for line in in_fh:
-            fh.write(line)
+            fh.write("{}{}".format(line, "\\n"))
 
     return filepath
+
+
+def run_trimmomatic(cli, logfile, sample_id):
+    """
+    Runs trimmomatic command
+    Parameters
+    ----------
+    cli : lst
+        list containing trimmomatic command
+    logfile : str
+        Path to file for trimmomatic to write log
+    sample_id: str
+        Sample Identification string.
+    """
+
+    logger.debug("Running trimmomatic subprocess with command: {}".format(cli))
+
+    p = subprocess.Popen(cli, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = p.communicate()
+
+    # Attempt to decode STDERR output from bytes. If unsuccessful, coerce to
+    # string
+    try:
+        stderr = stderr.decode("utf8")
+    except (UnicodeDecodeError, AttributeError):
+        stderr = str(stderr)
+
+    logger.info("Finished trimmomatic subprocess with STDOUT:\\n"
+                "======================================\\n{}".format(stdout))
+    logger.info("Finished trimmomatic subprocesswith STDERR:\\n"
+                "======================================\\n{}".format(stderr))
+    logger.info("Finished trimmomatic with return code: {}".format(
+        p.returncode))
+
+    trimmomatic_log(logfile, sample_id)
+
+    return p.returncode
 
 
 @MainWrapper
@@ -325,10 +366,12 @@ def main(sample_id, fastq_pair, trim_range, trim_opts, phred, adapters_file,
         phred = int(phred)
         phred_flag = "-phred{}".format(str(phred))
         cli += [phred_flag]
-    # Could not detect phred encoding. Do not add explicit encoding to
-    # trimmomatic and let it guess
+    # Could not detect phred encoding.
+    # Forcing as phred33 to avoid encoding errors
     except ValueError:
-        pass
+        logger.info("Could not detect quality encoding. Setting it to phred33")
+        phred_flag = "-phred33"
+        cli += [phred_flag]
 
     # Add input samples to CLI
     cli += fastq_pair
@@ -360,6 +403,9 @@ def main(sample_id, fastq_pair, trim_range, trim_opts, phred, adapters_file,
         "ILLUMINACLIP:{}:3:30:10:6:true".format(adapters_file)
     ]
 
+    #create log file im temporary dir to avoid issues when running on a docker container in macOS
+    logfile = os.path.join(tempfile.mkdtemp(prefix='tmp'), "{}_trimlog.txt".format(sample_id))
+
     # Add trimmomatic options
     cli += [
         "SLIDINGWINDOW:{}".format(trim_opts[0]),
@@ -368,40 +414,35 @@ def main(sample_id, fastq_pair, trim_range, trim_opts, phred, adapters_file,
         "MINLEN:{}".format(trim_opts[3]),
         "TOPHRED33",
         "-trimlog",
-        "{}_trimlog.txt".format(sample_id)
+        logfile
     ]
 
-    logger.debug("Running trimmomatic subprocess with command: {}".format(cli))
+    returncode = run_trimmomatic(cli, logfile, sample_id)
 
-    p = subprocess.Popen(cli, stdout=PIPE, stderr=PIPE)
-    stdout, stderr = p.communicate()
-
-    # Attempt to decode STDERR output from bytes. If unsuccessful, coerce to
-    # string
-    try:
-        stderr = stderr.decode("utf8")
-    except (UnicodeDecodeError, AttributeError):
-        stderr = str(stderr)
-
-    logger.info("Finished trimmomatic subprocess with STDOUT:\\n"
-                "======================================\\n{}".format(stdout))
-    logger.info("Finished trimmomatic subprocesswith STDERR:\\n"
-                "======================================\\n{}".format(stderr))
-    logger.info("Finished trimmomatic with return code: {}".format(
-        p.returncode))
-
-    trimmomatic_log("{}_trimlog.txt".format(sample_id), sample_id)
-
-    if p.returncode == 0 and os.path.exists("{}_1_trim.fastq.gz".format(
+    if returncode == 0 and os.path.exists("{}_1_trim.fastq.gz".format(
             SAMPLE_ID)):
         clean_up(fastq_pair, clear)
 
     # Check if trimmomatic ran successfully. If not, write the error message
     # to the status channel and exit.
     with open(".status", "w") as status_fh:
-        if p.returncode != 0:
-            status_fh.write("fail")
-            return
+        if returncode != 0:
+            # retry to run trimmomatic by changing the encoding from phred33 to phred64
+            if "-phred33" in cli:
+
+                logger.info("Trimmomatic failed while running with phred33. Setting it to phred64 and trying again...")
+                cli[7] = "-phred64"
+
+                returncode = run_trimmomatic(cli, logfile, sample_id)
+
+                if returncode != 0:
+                    status_fh.write("fail")
+                    return
+                else:
+                    status_fh.write("pass")
+            else:
+                status_fh.write("fail")
+                return
         else:
             status_fh.write("pass")
 

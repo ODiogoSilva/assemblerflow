@@ -25,6 +25,9 @@ class Mafft(Process):
         self.params = {
         }
 
+        self.link_end.append({"link": "_ref_seqTyping", "alias": "_ref_seqTyping"})
+
+
         self.directives = {
             "mafft": {
                 "container": "flowcraft/mafft",
@@ -37,6 +40,7 @@ class Mafft(Process):
         self.status_channels = [
             "mafft"
         ]
+
 
 class ProgressiveMauve(Process):
     """Mauve to align sequences

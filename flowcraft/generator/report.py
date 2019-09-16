@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import json
+import uuid
 import signal
 import socket
 import hashlib
@@ -15,9 +16,11 @@ from pympler.asizeof import asizeof
 try:
     import generator.error_handling as eh
     from generator.process_details import colored_print
+    from generator.utils import get_nextflow_filepath
 except ImportError:
     import flowcraft.generator.error_handling as eh
     from flowcraft.generator.process_details import colored_print
+    from flowcraft.generator.utils import get_nextflow_filepath
 
 logger = logging.getLogger("main.{}".format(__name__))
 
@@ -42,7 +45,7 @@ class FlowcraftReport:
         """
 
         if not ip_addr:
-            self.app_address = "http://192.92.149.169:80/"
+            self.app_address = "http://www.flowcraft.live:80/"
         else:
             self.app_address = ip_addr
             """
@@ -181,11 +184,9 @@ class FlowcraftReport:
 
         if self.watch:
 
-            with open(self.log_file) as fh:
-                header = fh.readline()
-
-            pipeline_path = re.match(
-                ".*nextflow run ([^\s]+).*", header).group(1)
+            # Searches for the first occurence of the nextflow pipeline
+            # file name in the .nextflow.log file
+            pipeline_path = get_nextflow_filepath(self.log_file)
 
             # Get hash from the entire pipeline file
             pipeline_hash = hashlib.md5()
@@ -195,7 +196,8 @@ class FlowcraftReport:
             # Get hash from the current working dir and hostname
             workdir = os.getcwd().encode("utf8")
             hostname = socket.gethostname().encode("utf8")
-            dir_hash = hashlib.md5(workdir + hostname)
+            hardware_addr = str(uuid.getnode()).encode("utf8")
+            dir_hash = hashlib.md5(workdir + hostname + hardware_addr)
 
             return pipeline_hash.hexdigest() + dir_hash.hexdigest()
 

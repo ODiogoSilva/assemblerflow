@@ -14,10 +14,6 @@ The addition of a new process to FlowCraft requires three main steps:
    information about the process (e.g., expected input/output, secondary inputs,
    etc.).
 
-#. `Add to available processes`_: Add the :class:`~flowcraft.generator.process` class to the
-   dictionary of available process in
-   :attr:`flowcraft.generator.engine.process_map`.
-
 .. _create-process:
 
 Create process template
@@ -32,7 +28,7 @@ substitute key variables in the process, such as input/output channels.
 An example created as a ``my_process.nf`` file is as follows::
 
     some_channel_{{ pid }} = Channel.value(params.param1{{ param_id}})
-    other_channel_{{ pid }} = Chanel.fromPath(params.param2{{ param_id}})
+    other_channel_{{ pid }} = Channel.fromPath(params.param2{{ param_id}})
 
     process myProcess_{{ pid }} {
 
@@ -211,20 +207,20 @@ Depending on the process, other attributes may be required:
     - `Directives`_: Default information for RAM/CPU/Container directives
       and more.
 
-Add to available processes
+Add to available components
 ::::::::::::::::::::::::::
 
-The final step is to add your new process to the list of available processes.
-This list is defined in :attr:`flowcraft.generator.engine.process_map`
-module, which is a dictionary
-mapping the process template name to the corresponding template class::
+Contrary to previous implementation (version <= 1.3.1), the available components
+are now retrieved automatically by FlowCraft and there is no need to add the
+process to any dictionary (previous ``process_map``). In order for the component
+to be accessible to ``flowcraft build`` the process template name in
+``snake_case`` must match the process class in ``CamelCase``. For instance,
+if the process template is named ``my_process.nf``, the process class must
+be ``MyProcess``, then the FlowCraft will be able to automatically add it to the
+list of available components.
 
-    process_map = {
-    <other_process>
-    "my_process_template": process.MyProcess
-    }
-
-Note that the template string does not include the ``.nf`` extension.
+.. note::
+    Note that the template string does not include the ``.nf`` extension.
 
 Process attributes
 ------------------

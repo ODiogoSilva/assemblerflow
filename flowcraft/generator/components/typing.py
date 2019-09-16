@@ -22,7 +22,7 @@ class SeqTyping(Process):
             "cpus": 4,
             "memory": "'4GB'",
             "container": "flowcraft/seq_typing",
-            "version": "0.1.0-1"
+            "version": "2.0-1"
         }}
 
         self.params = {
@@ -137,26 +137,70 @@ class DengueTyping(Process):
         super().__init__(**kwargs)
 
         self.input_type = "fasta"
-        self.output_type = None
+        self.output_type = "fasta"
 
-        self.link_start = None
+        self.link_end.append({"link": "__fastq", "alias": "_LAST_fastq"})
 
-        self.directives = {"dengue_typing": {
-            "cpus": 4,
-            "memory": "'4GB'",
-            "container": "flowcraft/dengue_typing",
-            "version": "v1.0-1"
-        }}
+        self.link_start.extend(["_ref_seqTyping"])
 
         self.params = {
-            "BD_sequence_file": {
-                "default": "'/dengue_DB/blast_db/GenotypesDENV_14-05-18.problematic_sequences_corrected.fasta.corrected.fasta.iupac_removed.fasta'",
+            "reference": {
+                "default": "ref/DENV_TYPING_DB_V2.fasta",
                 "description":
-                    "Path to the DB sequence file. If Blast DB was already"
-                    "produced only provide the file that doesn't end with '.n*'."
-                    "If no blast DB is found for the DB sequence file, one will"
-                    "be created. If more than one Blast DB file is passed, a type"
-                    "for each file will be determined."
+                    "Typing database."
+            },
+            "get_genome": {
+                "default": "true",
+                "description":
+                    "Retrieves the sequence of the closest reference."
             }
         }
 
+        self.directives = {"dengue_typing_assembly": {
+            "cpus": 4,
+            "memory": "'1GB'",
+            "container": "flowcraft/seq_typing",
+            "version": "2.0-1"
+        },
+            "dengue_typing_reads": {
+                "cpus": 4,
+                "memory": "{ 5.GB * task.attempt }",
+                "container": "ummidock/seq_typing",
+                "version": "2.2-02"
+            }
+        }
+
+        self.status_channels = [
+            "dengue_typing_assembly",
+            "dengue_typing_reads"
+        ]
+
+
+class Seroba(Process):
+    """
+    Serotyping of Streptococcus pneumoniae sequencing data
+    """
+
+    def __init__(self, **kwargs):
+
+        super().__init__(**kwargs)
+
+        self.input_type = "fastq"
+        self.output_type = None
+
+        self.params = {
+            "coverage": {
+                "default": "20",
+                "description":
+                    "Threshold for k-mer coverage of the reference sequence (default = 20)"
+            }
+        }
+
+        self.directives = {
+            "seroba": {
+                "cpus": 3,
+                "memory": "'4GB'",
+                "container": "sangerpathogens/seroba",
+                "version": "latest"
+            }
+        }
